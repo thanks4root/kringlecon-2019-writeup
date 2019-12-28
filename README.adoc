@@ -29,8 +29,6 @@ image::99/00-Hello.png[My character next to santa]
 
 === Escaping ED
 
-==== About
-
 Location: `Train Station`
 
 image::side/00-escape-ed/00-location.png[Picture of challenge location]
