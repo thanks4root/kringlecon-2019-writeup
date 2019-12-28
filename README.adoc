@@ -165,6 +165,194 @@ Confidential
 
 `First word in ALL CAPS` = `DEMAND`
 
+=== 03 - Windows Log Analysis: Evaluate Attack Outcome
+
+Location: `Offline`
+
+Difficulty: `1/5`
+
+.Objective
+----
+We're seeing attacks against the Elf U domain! Using the event log data, identify the user account that the attacker compromised using a password spray attack. Bushy Evergreen is hanging out in the train station and may be able to help you out.
+----
+
+==== Links
+
+. link:files/main/03/Security.evtx.zip[Security.evtx.zip]
+** Archive containing a Windows event log export for `Security`
++
+NOTE: SHA256 `7583da028561af31a25a9cecab2c0bb77967a646e4808773b0cc23e62b70c0dd`
+
+==== Solution
+
+. Setup working directory for this challenge
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-03.XXX)"
+
+# Extract the provided archive
+[/tmp/ctf-03.rhb]$ unzip /path/to/Security.evtx.zip
+Archive:  /path/to/Security.evtx.zip
+  inflating: Security.evtx
+
+# Create a python2 virtualenv
+[/tmp/ctf-03.rhb]$ python2 -m virtualenv .venv
+
+# Verify layout
+[/tmp/ctf-03.rhb]$ ls -A1
+Security.evtx
+.venv
+----
++
+. Activate the python virtualenv
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-03.rhb]$ source .venv/bin/activate
+(.venv) [/tmp/ctf-03.rhb]$
+----
++
+. Install python tools
++
+----
+# Install tools via pip
+(.venv) [/tmp/ctf-03.rhb]$ pip install \
+                                       'python-evtx>=0.6.1' \
+                                       'yq>=2.10.0'
+----
++
+. Convert `.evtx` to `.xml`
++
+[source, bash, options="nowrap"]
+----
+# Convert evtx => xml
+(.venv) [/tmp/ctf-03.rhb]$ time evtx_dump.py Security.evtx > Security.xml
+evtx_dump.py Security.evtx > Security.xml  39.01s user 0.07s system 99% cpu 39.084 total
+
+# Check sizes
+(.venv) [/tmp/ctf-03.rhb]$ ls -Alh Security.evtx Security.xml
+-rwxr-xr-x 1 t4r t4r 3.1M Nov 19 06:29 Security.evtx
+-rw-r--r-- 1 t4r t4r 6.9M Dec 28 14:40 Security.xml
+----
++
+. Convert `.xml` to `.json`
++
+[source, bash, options="nowrap"]
+----
+(.venv) [/tmp/ctf-03.rhb]$ time xq '.Events' Security.xml > Security.json
+xq '.Events' Security.xml > Security.json  10.74s user 2.95s system 121% cpu 11.282 total
+----
++
+. Disable virtualenv
++
+NOTE: We shouldn't need it anymore
++
+[source, bash, options="nowrap"]
+----
+(.venv) [/tmp/ctf-03.rhb]$ deactivate
+[/tmp/ctf-03.rhb]$
+----
++
+. Start pivoting with `jq`
+.. Figure out when the attack started - Event ID 4625
++
+[source, bash, options="nowrap"]
+----
+# Filter for failed logins
+[/tmp/ctf-03.rhb]$ cat Security.json \
+                     | jq '.Event[] | select(.System.EventID."#text"=="4625")' > Security-4625.json
+
+# Store jq filter
+[/tmp/ctf-03.rhb]$ read -r -d '' filter << 'EOF'
+[
+  {
+    "time": .System.TimeCreated."@SystemTime",
+    "user": .EventData.Data[] | select(."@Name"=="TargetUserName")."#text",
+    "ip": .EventData.Data[] | select(."@Name"=="IpAddress")."#text"
+  }
+]
+  | sort_by(.time)
+    | .[]
+EOF
+
+# Parse into readable format
+[/tmp/ctf-03.rhb]$ cat Security-4625.json \
+                     | jq -c "${filter}" > failed_logins.jsonl
+----
++
+... Review `failed_logins.jsonl`
++
+NOTE: Scan happened `2019-11-19 12:21` => `2019-11-19 12:22`
++
+.. Event ID 4624 (An account was successfully logged on)
++
+[source, bash, options="nowrap"]
+----
+# Filter for successful logins
+[/tmp/ctf-03.rhb]$ cat Security.json \
+                     | jq '.Event[] | select(.System.EventID."#text"=="4624")' > Security-4624.json
+----
++
+.Example 4624 event
+image::main/03/00-4624.png[Example 4624 event]
++
+.. Parse filtered `4624` events into a more readable format
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-03.rhb]$ read -r -d '' filter << 'EOF'
+[
+  {
+    "time": .System.TimeCreated."@SystemTime",
+    "user": .EventData.Data[] | select(."@Name"=="TargetUserName")."#text",
+    "ip": .EventData.Data[] | select(."@Name"=="IpAddress")."#text"
+  }
+]
+  | sort_by(.time)
+    | .[]
+EOF
+
+[/tmp/ctf-03.rhb]$ cat Security-4624.json \
+                     | jq -c "${filter}" \
+                       | tee logins.jsonl
+{"time":"2019-08-24 00:00:20.189180","user":"pminstix","ip":"192.168.86.128"}
+{"time":"2019-08-24 00:00:41.380116","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:21:34.496546","user":"pminstix","ip":"192.168.86.128"}
+{"time":"2019-11-19 12:21:41.375494","user":"DC1$","ip":"::1"}
+{"time":"2019-11-19 12:21:45.755442","user":"supatree","ip":"127.0.0.1"}
+{"time":"2019-11-19 12:21:46.715054","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:21:46.724463","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:22:25.172413","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:22:25.175280","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:22:25.180609","user":"DC1$","ip":"::1"}
+{"time":"2019-11-19 12:22:25.184385","user":"DC1$","ip":"192.168.86.190"}
+{"time":"2019-11-19 12:22:25.284060","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:22:41.383135","user":"DC1$","ip":"::1"}
+{"time":"2019-11-19 12:23:05.847099","user":"supatree","ip":"192.168.86.128"}
+{"time":"2019-11-19 12:23:41.405107","user":"DC1$","ip":"::1"}
+{"time":"2019-11-19 12:23:47.222954","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+----
++
+.. Filter out `Kerberos` events
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-03.rhb]$ cat logins.jsonl | grep -vE 'DC1\$'
+{"time":"2019-08-24 00:00:20.189180","user":"pminstix","ip":"192.168.86.128"}
+{"time":"2019-11-19 12:21:34.496546","user":"pminstix","ip":"192.168.86.128"}
+{"time":"2019-11-19 12:21:45.755442","user":"supatree","ip":"127.0.0.1"}
+{"time":"2019-11-19 12:23:05.847099","user":"supatree","ip":"192.168.86.128"}
+----
+... Note the odd one out
++
+----
+{"time":"2019-11-19 12:21:45.755442","user":"supatree","ip":"127.0.0.1"}
+----
++
+NOTE: Answer: `supatree`
+
 == Side challenges
 
 === Escaping ED
