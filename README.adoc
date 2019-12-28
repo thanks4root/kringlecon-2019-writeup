@@ -92,7 +92,7 @@ Location: `The Quad`
 
 Difficulty: `1/5`
 
-image::main/02/00-location.png[]
+image::main/02/00-location.png[Me next to the redacted document]
 
 .Objective
 ----
