@@ -31,9 +31,9 @@ image::99/00-Hello.png[My character next to santa]
 
 ==== About
 
-image::side/00-escape-ed/00-location.png[Picture of challenge location]
-
 Location: `Train Station`
+
+image::side/00-escape-ed/00-location.png[Picture of challenge location]
 
 The goal of this challenge is to find a way to escape from https://www.gnu.org/software/ed/manual/ed_manual.html[ed].
 
