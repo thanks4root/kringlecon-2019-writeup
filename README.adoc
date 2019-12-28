@@ -11,6 +11,8 @@ v0.1.0, 2019-12-28
 
 Location: `Train Station`
 
+Difficulty: `0/5`
+
 image::99/00-Hello.png[My character next to santa]
 
 * After signing in for the first time you find yourself at the `Train Station`
@@ -28,6 +30,8 @@ image::99/00-Hello.png[My character next to santa]
 === 00 - Talk to Santa in the Quad
 
 Location: `The Quad`
+
+Difficulty: `0/5`
 
 image::main/00/00-location.png[Me next to Santa]
 
