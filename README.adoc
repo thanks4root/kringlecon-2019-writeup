@@ -61,6 +61,31 @@ Enter the campus quad and talk to Santa.
 - If you help my elves with some quicker problems, they'll probably remember clues for the objectives.
 ----
 
+=== 01 - Find the Turtle Doves
+
+Location: `Student Union`
+
+Difficulty: `0/5`
+
+image::main/01/00-location.png[Me next to the doves]
+
+.Objective
+----
+Find the missing turtle doves.
+----
+
+==== Solution
+
+. Click on the doves until they repeat
+
+==== Chat
+
+.Chat log
+----
+(Michael and Jane - Two Turtle Doves)
+- Hoot Hooot?
+----
+
 == Side challenges
 
 === Escaping ED
