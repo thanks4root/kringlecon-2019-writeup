@@ -352,6 +352,82 @@ EOF
 +
 NOTE: Answer: `supatree`
 
+=== 04 - Windows Log Analysis: Determine Attacker Technique
+
+Location: `Offline`
+
+Difficulty: `2/5`
+
+.Objective
+----
+Using these normalized Sysmon logs, identify the tool the attacker used to retrieve domain password hashes from the lsass.exe process. For hints on achieving this objective, please visit Hermey Hall and talk with SugarPlum Mary.
+----
+
+==== Links
+
+* link:files/main/04/sysmon-data.json.zip[sysmon-data.json.zip]
+** Archive containing Sysmon data formatted as json
++
+NOTE: SHA256 `b54e4d573c100eb51328673f057e51b6292e2e071b421e94edf7d1fd02447d06`
+
+==== Solution
+
+. Create working directory
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-04.XXX)"
+
+# Unzip provided archive
+[/tmp/ctf-04.9SY]$ unzip /path/to/sysmon-data.json.zip
+Archive:  /path/to/sysmon-data.json.zip
+  inflating: sysmon-data.json
+
+# Verify size
+[/tmp/ctf-04.9SY]$ ls -Alh sysmon-data.json
+-rwx------ 1 t4r t4r 1.8M Dec  5 14:41 sysmon-data.json
+----
++
+. Figure out what type sysmon events we have
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-04.9SY]$ cat sysmon-data.json | jq '[.[].event_type] | unique'
+[
+  "file",
+  "network",
+  "process",
+  "registry"
+]
+----
++
+NOTE: As the challenge is asking for what tool was run on the host I decided to start with `process` events (event_id: `1`)
++
+. Filter out `event_type=process`
++
+[source, bash, options="nowrap"]
+----
+# Filter process events into `sysmon-data-process.jsonl`
+[/tmp/ctf-04.9SY]$ cat sysmon-data.json \
+                     | jq -c '.[] | select(.event_type=="process")' > sysmon-data-process.jsonl
+
+# Create an abbriged version of the process file
+# - This is easier to skim through
+[/tmp/ctf-04.9SY]$ cat sysmon-data-process.jsonl \
+                     | jq -c '[{"timestamp", "user_name", "process_name", "command_line"}] | sort_by(.timestamp) | .[]' > process_short.jsonl
+
+# Filter out boring commands with grep as you go
+[/tmp/ctf-04.9SY]$ cat process_short.jsonl \
+                     | grep -vE '(powershell|net|wevtutil|cmd)\.exe'
+{"timestamp":132186398470300000,"user_name":"SYSTEM","process_name":"ntdsutil.exe","command_line":"ntdsutil.exe  \"ac i ntds\" ifm \"create full c:\\hive\" q q"}
+----
+
+NOTE: Answer: `ntdsutil`
+
+[quote, 'https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/cc753343(v%3Dws.11)[Microsoft]']
+Ntdsutil.exe is a command-line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). You can use the ntdsutil commands to perform database maintenance of AD DS, manage and control single master operations, and remove metadata left behind by domain controllers that were removed from the network without being properly uninstalled. This tool is intended for use by experienced administrators.
+
 == Side challenges
 
 === Escaping ED
