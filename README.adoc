@@ -162,7 +162,7 @@ Confidential
 Confidential
 ----
 
-`First word in ALL CAPS` = `DEMAND`
+NOTE: Answer: `DEMAND`
 
 === 03 - Windows Log Analysis: Evaluate Attack Outcome
 
@@ -349,7 +349,7 @@ EOF
 ----
 {"time":"2019-11-19 12:21:45.755442","user":"supatree","ip":"127.0.0.1"}
 ----
-+
+
 NOTE: Answer: `supatree`
 
 === 04 - Windows Log Analysis: Determine Attacker Technique
