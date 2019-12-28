@@ -2,3 +2,75 @@
 Brandon Ingalls <brandon@tr4.dev>
 v0.1.0, 2019-12-28
 :toc:
+:imagesdir: ./images
+
+== Side challenges
+
+=== Escaping ED
+
+==== About
+
+image::side/00-escape-ed/00-location.png[Picture of challenge location]
+
+Location: `Train Station`
+
+The goal of this challenge is to find a way to escape from https://www.gnu.org/software/ed/manual/ed_manual.html[ed].
+
+.Initial
+----
+                  ........................................
+               .;oooooooooooool;,,,,,,,,:loooooooooooooll:
+             .:oooooooooooooc;,,,,,,,,:ooooooooooooollooo:
+           .';;;;;;;;;;;;;;,''''''''';;;;;;;;;;;;;,;ooooo:
+         .''''''''''''''''''''''''''''''''''''''''';ooooo:
+       ;oooooooooooool;''''''',:loooooooooooolc;',,;ooooo:
+    .:oooooooooooooc;',,,,,,,:ooooooooooooolccoc,,,;ooooo:
+  .cooooooooooooo:,''''''',:ooooooooooooolcloooc,,,;ooooo,
+  coooooooooooooo,,,,,,,,,;ooooooooooooooloooooc,,,;ooo,
+  coooooooooooooo,,,,,,,,,;ooooooooooooooloooooc,,,;l'
+  coooooooooooooo,,,,,,,,,;ooooooooooooooloooooc,,..
+  coooooooooooooo,,,,,,,,,;ooooooooooooooloooooc.
+  coooooooooooooo,,,,,,,,,;ooooooooooooooloooo:.
+  coooooooooooooo,,,,,,,,,;ooooooooooooooloo;
+  :llllllllllllll,'''''''';llllllllllllllc,
+
+
+
+Oh, many UNIX tools grow old, but this one's showing gray.
+That Pepper LOLs and rolls her eyes, sends mocking looks my way.
+I need to exit, run - get out! - and celebrate the yule.
+Your challenge is to help this elf escape this blasted tool.
+
+-Bushy Evergreen
+
+Exit ed.
+
+1100
+----
+
+==== Solution
+
+. Press `Q` then the `[enter]` key
++
+image::side/00-escape-ed/01-solution.png[Picture of the solution dialog]
+
+==== Chat
+
+----
+(Bushy Evergreen - PRE)
+- Hi, I'm Bushy Evergreen. Welcome to Elf U!
+- I'm glad you're here. I'm the target of a terrible trick.
+- Pepper Minstix is at it again, sticking me in a text editor.
+- Pepper is forcing me to learn ed.
+- Even the hint is ugly. Why can't I just use Gedit?
+- Please help me just quit the grinchy thing.
+
+(Bushy Evergreen - POST)
+-Wow, that was much easier than I'd thought.
+-Maybe I don't need a clunky GUI after all!
+-Have you taken a look at the password spray attack artifacts?
+-I'll bet that DeepBlueCLI tool is helpful.
+-You can check it out on GitHub.
+-It was written by that Eric Conrad.
+-He lives in Maine - not too far from here!
+----
