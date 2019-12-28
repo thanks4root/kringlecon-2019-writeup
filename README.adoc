@@ -99,9 +99,12 @@ image::main/02/00-location.png[Me next to the redacted document]
 Someone sent a threatening letter to Elf University. What is the first word in ALL CAPS in the subject line of the letter? Please find the letter in the Quad.
 ----
 
-==== Files
+==== Links
 
-link:files/main/02/LetterToElfUPersonnel.pdf[LetterToElfUPersonnel.pdf] - `SHA256 2f7b3ba81f1718d29ee73e82b19eb0f7a85e5b7835aaac0155edd233619b3c5e`
+. link:files/main/02/LetterToElfUPersonnel.pdf[LetterToElfUPersonnel.pdf]
+** The redacted document
++
+NOTE: SHA256 `2f7b3ba81f1718d29ee73e82b19eb0f7a85e5b7835aaac0155edd233619b3c5e`
 
 ==== Solution
 
