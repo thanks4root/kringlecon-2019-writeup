@@ -819,6 +819,8 @@ image::main/07/05-122520.png[My key]
 
 image::main/07/06-win.png[Win screen]
 
+*Answer:* `Krampus Hollyfeld`
+
 ==== Chat
 
 .Chat log
