@@ -831,8 +831,235 @@ image::main/07/06-win.png[Win screen]
 - Sometimes you can find it in the Network tab of the browser console.
 - Deviant has a great talk on it at this year's Con.
 - He even has a collection of key bitting templates for common vendors like Kwikset, Schlage, and Yale.
+----
 
-(Krampus - POST)
+=== 08 - Bypassing the Frido Sleigh CAPTEHA
+
+Location: `TBD`
+
+Difficulty: `4/5`
+
+image::main/08/00-location.png[Me next to Krampus]
+
+.Objective
+----
+Help Krampus beat the Frido Sleigh contest. For hints on achieving this objective, please talk with Alabaster Snowball in the Speaker Unpreparedness Room.
+----
+
+WARNING: On my initial run through of the CTF I completed this challenge before 07, so I did not have access to the files listed below, I ended up manually building my training data and model without the nice `capteha_api.py` file or the training data.
+
+==== Links
+
+* https://fridosleigh.com/[Frido Sleigh]
++
+image::main/08/01-site.png[Screenshot of the website]
++
+* https://mega.nz/#!Q0pnAYaB!ht9-69waSJUjorEiMybCebgCmajMsknA4NmHdx3wH20[capteha_api.py]
+** Skeleton solution script that I missed :)
++
+NOTE: SHA256: `322d960882a69d0966f1a4e10cb14d35e6f0f7edfc90ac37bdbeb564bdc00fae`
++
+* https://mega.nz/#!o55xUQ7I!dCIIiFp81T7B8RrKDHNCZUB9tS2zQElZpW-FSkQq3lo[capteha_images.tar.gz]
+** Data to train your model with; which I also missed...
++
+NOTE: SHA256: `c8b2be64449d4418dddb662c1c97f38343912952d53df6f77c5d87661449ff55`
+
+==== Solution
+
+. Review the website
+. Review the CAPTEHA api call
++
+NOTE: If you deal with json data a lot, https://github.com/tomnomnom/gron[gron] can make your data so much more readable.
++
+[source, bash, options="nowrap"]
+----
+[~]$ curl -s 'https://fridosleigh.com/api/capteha/request' \
+       | gron \
+         | sed -re 's,^(json\.images\[[[:digit:]]+\]\.base64 = ").+(";),\1REMOVED\2,' \
+           | tail -n 10
+json.images[97].base64 = "REMOVED";
+json.images[97].uuid = "40468a9a-e588-11e9-97c1-309c23aaf0ac";
+json.images[98] = {};
+json.images[98].base64 = "REMOVED";
+json.images[98].uuid = "4a7b97a2-e588-11e9-97c1-309c23aaf0ac";
+json.images[99] = {};
+json.images[99].base64 = "REMOVED";
+json.images[99].uuid = "4b5934cf-e588-11e9-97c1-309c23aaf0ac";
+json.request = true;
+json.select_type = "Presents, Ornaments, and Santa Hats";
+
+----
++
+** Pretty simple response format of
++
+----
+{
+  images: [{"uuid": "", "base64": ""}, * 100],
+  request: bool,
+  select_type: "List, of, three"
+}
+----
++
+** `images.base64` is a `PNG` encoded in base64
+** `images.uuid` is a uuid
+** `select_type` is the list of images the CAPTEHA system is expecting
++
+. Build a working directory
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-08.XXX)"
+
+# Create a python virtualenv
+[/tmp/ctf-08.h8U]$ python2 -m virtualenv .venv
+
+# Activate venv
+[/tmp/ctf-08.h8U]$ source .venv/bin/activate
+(.venv) [/tmp/ctf-08.h8U]$
+----
++
+. Gather training data
+** Build a tool to collect images for the model
++
+[source, bash, options="nowrap"]
+----
+# Install deps
+(.venv) [/tmp/ctf-08.h8U]$ pip install 'requests>=2.22.0'
+
+# Extract my tool
+(.venv) [/tmp/ctf-08.h8U]$ base64 -d << 'EOF' | gunzip --stdout | tee download-images.py
+H4sICCkeCV4CA2Rvd25sb2FkLWltYWdlcy5weQBlUstuxCAMvOcrWHphpQqkarWHlXJrvwOR4CRu
+G6BA9qGq/14IyWar+uTY45mxw9OOiCl40aARYM7E3eJgzUtV4eisj6RRAY6H9es9WLPmNqyZh68J
+QgxVVWnoyKjQsP2pIimwI8ZmLHcqDhyDRs8oFziqHgJdUDkSZFQfkPrhEVDNAE/quwrvITI6xOjC
+SYjOo7bhE7AfeGtHoRyKVrkIgxLLRCKZOSA4awIkqrwG/7RKB+Z5hGtcZIrorFWwRevu5WGjUtvs
+e4WJ+u3agotoDaOvqGeghxbwDESZ2zK0W7fqrC8lguYfoVFjtjqXi41pQr2YyNEcD3/75Vc9IBy2
+cfKZpbR4GtHQWg0sZRvugnEg1oHZDi++s9oPd6anPPkcVWS5Umdb+2dCLw3dExVItzmeV+IXjxHY
+Ir1ePuUmvY50Oykzg5SkrgmVMr8VKWkhKQ+n+gXDU5CxkwIAAA==
+EOF
+
+# Run the downlaoder a number of times
+(.venv) [/tmp/ctf-08.h8U]$ python download-images.py
+
+# Check number of files
+(.venv) [/tmp/ctf-08.h8U]$ find ./images | wc -l
+1000
+----
++
+image::main/08/02-have-pics.png[Showing I have images downloaded]
++
+** Manually categorize all of these images :(
++
+.Folders for each type
+image::main/08/03-folders.png[Folders of picture types]
++
+.All clean and uniform
+image::main/08/04-neat.png[Showing each folder only has images of that type]
+. Build a model
+** I wanted to try Google's https://teachablemachine.withgoogle.com/[Teachable Machine] for this
++
+image::main/08/05-tm.png[New project screen]
++
+** I went with the `Image Project`
+** I created a class for each of the image types
++
+image::main/08/06-classes.png[Picture of all classes]
++
+** Named all 6 classes `candy_canes, christmas_trees, ornaments, presents, santa_hats, and stockings`
+** Uploaded photos into their classes
++
+image::main/08/07-full.png[]
++
+** Clicked `Train Model` button
++
+image::main/08/08-training.png[]
++
+** Exported my model
++
+image::main/08/09-export.png[]
++
+. Solve the CAPTEHA
+** Run my custom script
++
+[source, bash, options="nowrap"]
+----
+# Install deps
+(.venv) [/tmp/ctf-08.h8U]$ pip install \
+                                       'tensorflow>=2.0.0' \
+                                       'Pillow>=6.2.1'
+
+# Copy model to working dir
+(.venv) [/tmp/ctf-08.h8U]$ cp /path/to/keras_model.h5 .
+
+# Extract my script
+(.venv) [/tmp/ctf-08.h8U]$ base64 -d << 'EOF' | gunzip --stdout | tee not-human.py
+H4sICAUoCV4CA25vdC1odW1hbi5weQCdVt1v4zYMf/dfwbkPp2yp0/a621AgD+s+DgWKbdjdWxAY
+is00utqST5LbeMP97yMlf6XXvSwPgUT+RInkj6TPvoFV6+xqp/QK9RM0nT8YfZUkqm6M9bCTDt9d
+DztlhtUnZ/Sw1m3ddMPG4ucWnXfD3qN2xu4r85w9opUu2VtTw59399AD7mr5gEly/9Ptr/cfYA2b
+BOiXOqm9hIP0Ll1GSSF12QH94yhy3hSPSj9MmINVztfSgbc44YzVskY92Wosun6/TZIz+EU5uasQ
+XKFIrPaqAG289Mpo2BsLRSWt8l0SXM0c+ryxSnvTMMIJ1zZs0a0/2hYXbPDeyBL8AaE2JVZJ+Cfn
+XkYjCwqXVQTPw1qkQRE32eH7dAmFqRtV4fo3WTm2bnNHd/HT1mO4sw9RJFjP8gGTNcZ5kR68b9zN
+arW3qjSuQvVwyMjuSjZqVcjG40GuelvpIiklxX4dkhye5oTNPB79gnlB6XKkZEz2gGQ7itJBmVeU
+Ak4kRZZjF4SgdFy4m5ABzgdhgihaaVtVkg1W7t5dn+oiC3ttowrfWj4dxRnBSywoXoJWETM9JJNN
+g7oUgm9cDocXJ4/NK+RY0r+YhCGN79GHLAaXzJ7WzLYg6qMGykFlDLOQmZJERG7l80mMHFZY+Nx3
+DZIbPYhogJys6UwWRGJATLogz1xTKTK2hNHG5vxyO6J4k1lsKlmgSKlcgKFp8ORni9JjeLm0VnbR
+GwRLTPDgDrIhpYE9YgnM7KAMVOwpfAYfSfKGgvTgD2+AEkvFsKP3k6GeFJ1puT6haf1kI96mHBko
+0aOtlaYrdl1Q7pWlwBJFVSg1IglL+9e0TUUZCzIKckHJhsts4GasRF0G8yKcWIvTlC7h6uq6/3u7
+WELJ0V/Hg1SC0r+9iqEx+gmpE8mqGqLSO0Qu/PX+FlzwpINnRYhnYx/p0LPyhwClwj9/QE2R8uRX
+LNtE0QsvAvsfl/A0kj887WbG0F3n0eXKMN1Ndsu7uz/E05zEkUmhS2amGSk6nJxBh5oJRCqiUyIl
+B5gBX6GIKE79jUIMQVrMb41ZG8IsXQxz0PXGzuB3Y2tZkY0pZLG2B3mZnxoTsy3Z5HSI03TACi6v
+fsguFnAOl8M9Yy8dOsmcWQHDnNgoLoTX746OwXdrNnoGto08U3qPFnWBCSWxpM4Qe2rMYS8SbHsx
+A0R6hQcTdpJn3rBGnFCqJwi1p2A7tJEwAMP5QDByBxq0BY8jOnlOZUZsD1TbIbSOSEWoz60qHquO
+CkbHWFRyRxPF04AkmPN0Ekjp3SwXL97MLXlDt4kOvoXLC4ox87Njch63YX3k9aueUitPwo1EOV3i
+kW0ds7AUtTyK42LxnxborGk99YS8L91/vprwNzQsXpnyM/E06efYF9N+ppom/kw4Tv0o+9LPp2UM
+Zu8ZOYBEylDPYu7zIhZuDPwa4gfLZnZ0G/RFyy195nGEbCObecqNdcrRIdpuLsaTw7RiGBFJakdt
+382GaWj0fU+kaMQn9bCMJjQfnt8dYNvRVO68ZQNrmgxp9skoLfrDBOEvhTFHaZRTqE5Ofvn/nxeu
+3dXK00Qa7+E7+TNq/LqIu/Q8JYb+eDHsp8sKHrToeKTmoTipZ/0LOsUMC8IKAAA=
+EOF
+
+# Run the script and extract the JWT from the response
+(.venv) [/tmp/ctf-08.h8U]$ python not-human.py
+{"data":"You are not a human!","request":true}
+
+--------------------------------------------------------------------------------
+{'session': 'LONG_JWT'}
+----
++
+. Submit form a bunch of times
++
+NOTE: You need to use a real email address as a key is emailed to you.
++
+NOTE: When you extract the script for this section there are two variables that you need to fill in; `JWT` and `EMAIL`
++
+----
+# Extract my script
+(.venv) [/tmp/ctf-08.h8U]$ base64 -d << 'EOF' | gunzip --stdout | tee send-form.py
+H4sICIYrCV4CA3NlbmQtZm9ybS5weQBVUU1PwzAMvedXhHDppNECJ1RpEiCBKBpcNoljlLXuGq1N
+QuIOJsR/Jx+sjBwS+T0/x/Y7P6PF6GyxkaoAtafmgJ1W14TIwWiL1ML7CA4dIc9va7qg7LFaLvn6
+qVrx6pWRh5e7ahnggx7trQXRX8AgZJ/XemCEkAZa6mOVzUpC/am13knwgmPdPCH+9WIEnsKMOXBO
+asXm1P87i1p3KlslPvulpjIO8FgjPSmhESi8/CsG4bBW7LWVCI6VlNWjkU1tR1V3bP6XI7YQ2Kub
+y3/oRo8Y8J1EPJwycXTPxK2c4EoMsdC9FaoJQ0XqO94fneyBru0I5SSwvlWXG+0wYx2icWVRtFY2
+2vUgt11YbiGM9Iah9Q3E6WaT2lipMLM5wicm1AjnDSSypZyHXjinC+8Z58Eazln6OflEfgAdzs9M
+EgIAAA==
+EOF
+
+# Edit the script to fill in your information
+
+# Run script; Ctrl+C when you see the message about already winning
+(.venv) [/tmp/ctf-08.h8U]$ python send-form.py
+...
+Entries for email address REDACTED no longer accepted as our systems show your email was already randomly selected as a winner! Go check your email to get your winning code. Please allow up to 3-5 minutes for the email to arrive in your inbox or check your spam filter settings.
+----
+
+image::main/08/10-email.png[Winner email]
+
+*Answer:* `8Ia8LiZEwvyZr2WO`
+
+==== Chat
+
+.Chat log
+----
+(Krampus - PRE)
 - Hello there! I’m Krampus Hollyfeld.
 - I maintain the steam tunnels underneath Elf U,
 - Keeping all the elves warm and jolly.
@@ -850,6 +1077,17 @@ image::main/07/06-win.png[Win screen]
 - (That's Completely Automated Public Turing test to tell Elves and Humans Apart.)
 - I've already cataloged 12,000 images and decoded the API interface.
 - Can you help me bypass the CAPTEHA and submit lots of entries?
+
+(Krampus - POST)
+- Hello there! I’m Krampus Hollyfeld.
+- You did it! Thank you so much. I can trust you!
+- To help you, I have flashed the firmware in your badge to unlock a useful new feature: magical teleportation through the steam tunnels.
+- As for those scraps of paper, I scanned those and put the images on my server.
+- I then threw the paper away.
+- Unfortunately, I managed to lock out my account on the server.
+- Hey! You’ve got some great skills. Would you please hack into my system and retrieve the scans?
+- I give you permission to hack into it, solving Objective 9 in your badge.
+- And, as long as you're traveling around, be sure to solve any other challenges you happen across.
 ----
 
 == Side challenges
