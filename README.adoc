@@ -547,6 +547,223 @@ NOTE: Answer: `192.168.134.130`
 - But I fear what’s to happen all happened before!
 ----
 
+=== 06 - Splunk
+
+Location: `https://splunk.elfu.org/`
+
+Difficulty: `3/5`
+
+image::main/06/00-location.png[Challenge screen]
+
+.Objective
+----
+Access https://splunk.elfu.org/ as elf with password elfsocks. What was the message for Kent that the adversary embedded in this attack? The SOC folks at that link will help you along! For hints on achieving this objective, please visit the Laboratory in Hermey Hall and talk with Prof. Banas.
+----
+
+==== Solution
+
+===== Part A
+
+We need to complete the Training questions to get important bits of information before we can complete the challenge question.
+
+. What is the short host name of Professor Banas' computer?
+** We can find this inside of the `SOC chat`
++
+image::main/06/01-hostname.png[Picture showing hostname of sweetums]
++
+NOTE: *Answer:* `sweetums`
++
+. What is the name of the sensitive file that was likely accessed and copied by the attacker? Please provide the fully qualified location of the file. (Example: C:\temp\report.pdf)
+** After solving question one, the chat app updates with more information
++
+image::main/06/02-hint.png[Hint that gives you a starting search]
++
+** The link takes you to the following Splunk search
++
+----
+index=main cbanas
+----
++
+** As the question was asking for information on information accessed by the attacker I used a basic search...
++
+----
+    index=main
+AND cbanas
+AND Users
+----
++
+image::main/06/03-answer.png[Answer for q02]
++
+NOTE: *Answer:* `C:\Users\cbanas\Documents\Naughty_and_Nice_2019_draft.txt`
++
+. What is the fully-qualified domain name(FQDN) of the command and control(C2) server? (Example: badguy.baddies[.]com)
+** It looked like Empire was being used on the Windows host
+** I did a search for Sysmon Event ID *3* made by `powershell.exe`
++
+----
+    index=main
+AND EventID=3
+AND Computer="sweetums*"
+AND process_name="powershell.exe"
+----
++
+image::main/06/04-search.png[Search results]
++
+NOTE: *Answer:* `144.202.46[.]214.vultr[.]com`
++
+. What document is involved with launching the malicious PowerShell code? Please provide just the filename. (Example: results.txt)
+** Did a basic search for Sysmon event id `1`
++
+----
+    index=main
+AND EventID=1
+AND Computer="sweetums*"
+----
++
+image::main/06/05-table.png[Search results]
++
+** I see see Powershell running an Empire payload at `05:18 PM`
+** https://gchq.github.io/CyberChef/#recipe=From_Base64('A-Za-z0-9%2B/%3D',true)Decode_text('UTF-16LE%20(1200)')Generic_Code_Beautify()[CyberChef Recipe]
++
+image::main/06/06-payload.png[Empire payload decoded]
++
+NOTE: The parent process of the malicious `powershell.exe` is `WmiPrvSE.exe`, so it was started via a script, going to guess it was from an office product macro.
++
+** Struck out with this search
++
+----
+    index=main
+AND EventCode=1
+AND NOT docx
+----
++
+image::main/06/07-no-results.png[No bad results]
++
+** Noticed this message in chat
++
+image::main/06/08-chat.png[Chat message]
++
+** Tried new search (Limited to around the time Empire payload was executed)
++
+----
+    index=main
+AND EventCode=4688
+AND NOT docx
+
+| sort _time
+----
++
+image::main/06/09-found-bad.png[Table with bad doc]
++
+NOTE: *Answer:* `19th Century Holiday Cheer Assignment.docm`
++
+. How many unique email addresses were used to send Holiday Cheer essays to Professor Banas? Please provide the numeric value. (Example: 1)
+** Read the chat
++
+image::main/06/10-chat.png[Chat message]
++
+** Need to look for emails with the subject of *Holiday Cheer Assignment Submission*
++
+.Query
+----
+    index=main
+AND sourcetype=stoq
+AND results{}.workers.smtp.subject="Holiday Cheer Assignment Submission"
+
+| eval email_from = mvindex(lower('results{}.workers.smtp.from'), 0)
+  | stats dc(email_from)
+----
++
+NOTE: *Answer:* `21`
++
+. What was the password for the zip archive that contained the suspicious file?
+** Starting with this search
++
+----
+    index=main
+AND sourcetype=stoq
+AND results{}.workers.smtp.subject="Holiday Cheer Assignment Submission"
+AND docm
+----
++
+image::main/06/11-results.png[Search results]
++
+NOTE: *Answer:* `123456789`
++
+. What email address did the suspicious file come from?
+** Using my table from the previous question I was able to pull the email address for this question
++
+NOTE: *Answer:* `bradly.buttercups@eifu[.]org`
+
+==== Part B
+
+NOTE: This is the official challenge solution, we needed the information from the training questions to get the data for this question.
+
+. Find artifact meta information
++
+image::main/06/12-artifacts.png[Email artifacts]
++
+. Convert artifact links to download urls
++
+NOTE: We are provided with a http://elfu-soc.s3-website-us-east-1.amazonaws.com/[link] to the SOCs case artifacts
++
+[source, bash, options="nowrap"]
+----
+# Create work dir
+[~]$ cd "$(mktemp -d /tmp/ctf-06.XXX)"
+
+# Convert to bucket urls
+[/tmp/ctf-06.I4z]$ sed -re 's,^,http://elfu-soc.s3-website-us-east-1.amazonaws.com/stoQ%20Artifacts,' << 'EOF' | tee urls.txt
+/home/ubuntu/archive/7/f/6/3/a/7f63ace9873ce7326199e464adfdaad76a4c4e16
+/home/ubuntu/archive/9/b/b/3/d/9bb3d1b233ee039315fd36527e0b565e7d4b778f
+/home/ubuntu/archive/c/6/e/1/7/c6e175f5b8048c771b3a3fac5f3295d2032524af
+/home/ubuntu/archive/b/e/7/b/9/be7b9b92a7acd38d39e86f56e89ef189f9d8ac2d
+/home/ubuntu/archive/1/e/a/4/4/1ea44e753bd217e0edae781e8b5b5c39577c582f
+/home/ubuntu/archive/e/e/b/4/0/eeb40799bae524d10d8df2d65e5174980c7a9a91
+/home/ubuntu/archive/1/8/f/3/3/18f3376a0ce18b348c6d0a4ba9ec35cde2cab300
+/home/ubuntu/archive/f/2/a/8/0/f2a801de2e254e15840460f4a53e568f6622c48b
+/home/ubuntu/archive/1/0/7/4/0/1074061aa9d9649d294494bb0ae40217b9c7a2d9
+/home/ubuntu/archive/8/6/c/4/d/86c4d8a2f37c6b4709273561700640a6566491b1
+/home/ubuntu/archive/a/2/b/b/1/a2bb14afe8161ee9bd4a6ea10ef5a9281e42cd09
+/home/ubuntu/archive/4/0/d/c/1/40dc1e00e2663cb33f8c296cdb0cd52fa07a87b6
+/home/ubuntu/archive/f/5/c/b/a/f5cba8a650d6ada98d170f1b22098d93b8ff8879
+/home/ubuntu/archive/0/2/b/6/7/02b67cad55d2684115a7de04d0458a3af46b12c6
+/home/ubuntu/archive/1/7/6/1/2/1761214092f5c0e375ab3bc58a8687134b7f2582
+/home/ubuntu/archive/b/7/7/0/f/b770f3a79423882bdae4240e995c0885770022ef
+/home/ubuntu/archive/9/d/7/a/b/9d7abf0ee4effcecad80c8bbfb276079a05b4342
+/home/ubuntu/archive/e/9/2/1/1/e9211c706be234c20d3c02123d85fea50ae638fd
+/home/ubuntu/archive/f/f/1/e/a/ff1ea6f13be3faabd0da728f514deb7fe3577cc4
+/home/ubuntu/archive/7/f/6/3/a/7f63ace9873ce7326199e464adfdaad76a4c4e16
+/home/ubuntu/archive/9/b/b/3/d/9bb3d1b233ee039315fd36527e0b565e7d4b778f
+/home/ubuntu/archive/c/6/e/1/7/c6e175f5b8048c771b3a3fac5f3295d2032524af
+EOF
+----
++
+. Download artifacts
++
+[source, bash, options="nowrap"]
+----
+# Create artifact directory
+[/tmp/ctf-06.I4z]$ mkdir artifacts && cd artifacts
+
+# Downlaod the artifacts
+[/tmp/ctf-06.I4z/artifacts]$ for url in $(cat ../urls.txt); do curl -OL "${url}"; done
+----
++
+. Look for messages to Kent
++
+NOTE: I've only showed the relevant content
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-06.I4z/artifacts]$ grep -ir 'kent'
+ff1ea6f13be3faabd0da728f514deb7fe3577cc4:...<dc:description>Kent you are so unfair. And we were going to make you the king of the Winter Carnival.</dc:description>...
+----
+
+image::main/06/13-end.png[Congrats screen]
+
+*Answer*: `Kent you are so unfair. And we were going to make you the king of the Winter Carnival.`
+
 == Side challenges
 
 === Escaping ED
