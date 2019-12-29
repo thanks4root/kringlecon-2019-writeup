@@ -814,6 +814,7 @@ image::side/00-escape-ed/01-solution.png[Picture of the solution dialog]
 
 ==== Chat
 
+.Chat log
 ----
 (Bushy Evergreen - PRE)
 - Hi, I'm Bushy Evergreen. Welcome to Elf U!
