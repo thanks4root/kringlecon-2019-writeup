@@ -100,7 +100,7 @@ Someone sent a threatening letter to Elf University. What is the first word in A
 
 ==== Links
 
-. link:files/main/02/LetterToElfUPersonnel.pdf[LetterToElfUPersonnel.pdf]
+. https://mega.nz/#!N9gBVaSZ!FtcN0Sf22Nf7ma0OSWI0OOzs6xoH0UAE5CAcelpNQuU[LetterToElfUPersonnel.pdf]
 ** The redacted document
 +
 NOTE: SHA256 `2f7b3ba81f1718d29ee73e82b19eb0f7a85e5b7835aaac0155edd233619b3c5e`
@@ -177,7 +177,7 @@ We're seeing attacks against the Elf U domain! Using the event log data, identif
 
 ==== Links
 
-. link:files/main/03/Security.evtx.zip[Security.evtx.zip]
+. https://mega.nz/#!choxHC7K!C1r5Yp4ikeA_OnYswhEKuwLEqWgYxoLCAUTh-oMiiso[Security.evtx.zip]
 ** Archive containing a Windows event log export for `Security`
 +
 NOTE: SHA256 `7583da028561af31a25a9cecab2c0bb77967a646e4808773b0cc23e62b70c0dd`
@@ -365,7 +365,7 @@ Using these normalized Sysmon logs, identify the tool the attacker used to retri
 
 ==== Links
 
-* link:files/main/04/sysmon-data.json.zip[sysmon-data.json.zip]
+* https://mega.nz/#!VwojHSaS!u7mcytO5T4rfpxLhMowJ3-fY4ROsDB4Tst-J6XbYoys[sysmon-data.json.zip]
 ** Archive containing Sysmon data formatted as json
 +
 NOTE: SHA256 `b54e4d573c100eb51328673f057e51b6292e2e071b421e94edf7d1fd02447d06`
@@ -441,7 +441,7 @@ The attacks don't stop! Can you help identify the IP address of the malware-infe
 
 ==== Links
 
-* link:files/main/05/elfu-zeeklogs.zip[elfu-zeeklogs.zip]
+* https://mega.nz/#!x0gVCSob!e6YHqJcdXYKVzdJDZOte2hpGZGN5uapE2UpBmFSGUQk[elfu-zeeklogs.zip]
 ** Archive of Zeek logs
 +
 NOTE: SHA256: `8b2d0d64c310d63efe9fc57e6945f9f8d4498501b39039cd161ee5a9485258af`
