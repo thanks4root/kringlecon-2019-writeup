@@ -529,6 +529,24 @@ NOTE: `192.168.134.130` => `148.69.64[.]76:443/tcp` seems pretty *sketch*.
 
 NOTE: Answer: `192.168.134.130`
 
+==== Chat
+
+.Chat log
+----
+(Santa)
+- Thank you for finding Jane and Michael, our two turtle doves!
+- I’ve got an uneasy feeling about how they disappeared.
+- Turtle doves wouldn’t wander off like that.
+- Someone must have stolen them! Please help us find the thief!
+- It’s a moral imperative!
+- I think you should look for an entrance to the steam tunnels and solve Challenge 6 and 7 too!
+- Gosh, I can’t help but think:
+- Winds in the East, snow coming in…
+- Like something is brewing and about to begin!
+- Can’t put my finger on what lies in store,
+- But I fear what’s to happen all happened before!
+----
+
 == Side challenges
 
 === Escaping ED
