@@ -764,6 +764,94 @@ image::main/06/13-end.png[Congrats screen]
 
 *Answer*: `Kent you are so unfair. And we were going to make you the king of the Winter Carnival.`
 
+=== 07 - Get Access To The Steam Tunnels
+
+Location: `Dorm`
+
+Difficulty: `3/5`
+
+image::main/07/00-location.png[Room in the dorm]
+
+.Objective
+----
+Gain access to the steam tunnels. Who took the turtle doves? Please tell us their first and last name. For hints on achieving this objective, please visit Minty's dorm room and talk with Minty Candy Cane.
+----
+
+==== Solution
+
+[quote, Minty Candycane]
+Maybe you'll see someone hopping around with a key here on campus.
+
+The goal of this challenge is to decode a key's bitting via an image of the key.
+
+When you first enter the room there is a NPC character that leaves into another room after a few moments.
+
+NOTE: This character has the key you are looking for on their belt.
+
+. Open the browser's network tools tab
++
+image::main/07/01-tools.png[Network tool]
++
+. Enter the room
+. Locate the NPC's asset load network event
++
+image::main/07/02-get.png[Krampus asset network event]
++
+. Save the asset
++
+----
+https://2019.kringlecon.com/images/avatars/elves/krampus.png
+----
++
+image::main/07/03-krampus.png[Krampus asset, height=100, width=100]
++
+. Cleaned the picture up with GIMP
++
+image::main/07/04-key.png[Plain key]
++
+. Decoded the key by looking at the heights relative to each other
++
+NOTE: *Key Bitting*: `122520`
++
+image::main/07/07-make-key.png[Crerating a key]
++
+image::main/07/05-122520.png[My key]
+
+image::main/07/06-win.png[Win screen]
+
+==== Chat
+
+.Chat log
+----
+(Minty Candycane; Had to complete Holiday Hack Trail)
+- You made it - congrats!
+- Have you played with the key grinder in my room? Check it out!
+- It turns out: if you have a good image of a key, you can physically copy it.
+- Maybe you'll see someone hopping around with a key here on campus.
+- Sometimes you can find it in the Network tab of the browser console.
+- Deviant has a great talk on it at this year's Con.
+- He even has a collection of key bitting templates for common vendors like Kwikset, Schlage, and Yale.
+
+(Krampus - POST)
+- Hello there! I’m Krampus Hollyfeld.
+- I maintain the steam tunnels underneath Elf U,
+- Keeping all the elves warm and jolly.
+- Though I spend my time in the tunnels and smoke,
+- In this whole wide world, there's no happier bloke!
+- Yes, I borrowed Santa’s turtle doves for just a bit.
+- Someone left some scraps of paper near that fireplace, which is a big fire hazard.
+- I sent the turtle doves to fetch the paper scraps.
+- But, before I can tell you more, I need to know that I can trust you.
+- Tell you what – if you can help me beat the Frido Sleigh contest (Objective 8), then I'll know I can trust you.
+- The contest is here on my screen and at fridosleigh.com.
+- No purchase necessary, enter as often as you want, so I am!
+- They set up the rules, and lately, I have come to realize that I have certain materialistic, cookie needs.
+- Unfortunately, it's restricted to elves only, and I can't bypass the CAPTEHA.
+- (That's Completely Automated Public Turing test to tell Elves and Humans Apart.)
+- I've already cataloged 12,000 images and decoded the API interface.
+- Can you help me bypass the CAPTEHA and submit lots of entries?
+----
+
 == Side challenges
 
 === Escaping ED
