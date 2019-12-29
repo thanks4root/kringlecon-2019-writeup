@@ -162,7 +162,7 @@ Confidential
 Confidential
 ----
 
-NOTE: Answer: `DEMAND`
+NOTE: *Answer:* `DEMAND`
 
 === 03 - Windows Log Analysis: Evaluate Attack Outcome
 
@@ -350,7 +350,7 @@ EOF
 {"time":"2019-11-19 12:21:45.755442","user":"supatree","ip":"127.0.0.1"}
 ----
 
-NOTE: Answer: `supatree`
+NOTE: *Answer:* `supatree`
 
 === 04 - Windows Log Analysis: Determine Attacker Technique
 
@@ -423,7 +423,7 @@ NOTE: As the challenge is asking for what tool was run on the host I decided to 
 {"timestamp":132186398470300000,"user_name":"SYSTEM","process_name":"ntdsutil.exe","command_line":"ntdsutil.exe  \"ac i ntds\" ifm \"create full c:\\hive\" q q"}
 ----
 
-NOTE: Answer: `ntdsutil`
+NOTE: *Answer:* `ntdsutil`
 
 [quote, 'https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/cc753343(v%3Dws.11)[Microsoft]']
 Ntdsutil.exe is a command-line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). You can use the ntdsutil commands to perform database maintenance of AD DS, manage and control single master operations, and remove metadata left behind by domain controllers that were removed from the network without being properly uninstalled. This tool is intended for use by experienced administrators.
@@ -527,7 +527,7 @@ EOF
 +
 NOTE: `192.168.134.130` => `148.69.64[.]76:443/tcp` seems pretty *sketch*.
 
-NOTE: Answer: `192.168.134.130`
+NOTE: *Answer:* `192.168.134.130`
 
 ==== Chat
 
