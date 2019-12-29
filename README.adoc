@@ -428,6 +428,107 @@ NOTE: Answer: `ntdsutil`
 [quote, 'https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/cc753343(v%3Dws.11)[Microsoft]']
 Ntdsutil.exe is a command-line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). You can use the ntdsutil commands to perform database maintenance of AD DS, manage and control single master operations, and remove metadata left behind by domain controllers that were removed from the network without being properly uninstalled. This tool is intended for use by experienced administrators.
 
+=== 05 - Network Log Analysis: Determine Compromised System
+
+Location: `Offline`
+
+Difficulty: `2/5`
+
+.Objective
+----
+The attacks don't stop! Can you help identify the IP address of the malware-infected system using these Zeek logs? For hints on achieving this objective, please visit the Laboratory and talk with Sparkle Redberry.
+----
+
+==== Links
+
+* link:files/main/05/elfu-zeeklogs.zip[elfu-zeeklogs.zip]
+** Archive of Zeek logs
++
+NOTE: SHA256: `8b2d0d64c310d63efe9fc57e6945f9f8d4498501b39039cd161ee5a9485258af`
+
+==== Solution
+
+. Create working directory
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-05.XXX)"
+
+# Unzip provided archive
+[/tmp/ctf-05.bl9]$ unzip /path/to/elfu-zeeklogs.zip
+Archive:  /path/to/elfu-zeeklogs.zip
+...
+  inflating: elfu-zeeklogs/conn.log-00057_20190824000518.log
+----
++
+. Create tool to parse the `Zeek` logs into `jsonl`
++
+NOTE: I made a quick python script to do this
++
+NOTE: This will make it easier to use `jq` to filter the data
++
+.Custom script
+[source, bash, options="nowrap"]
+----
+# Extract log converter
+[/tmp/ctf-05.bl9]$ base64 -d << 'EOF' | gzip --decompress > convert-log.py
+H4sICHP2B14CA2NvbnZlcnQtbG9nLnB5AH1VPVPjMBDt/SuEUsSeAQNXZibFFRTXcBRU58t4RLxJ
+dNiSR5JDgOG/366k+CMBXGRs6e3b75fZBbvurLl+kuoa1J61r26n1Y8kkU2rjWPCbFthLBy//1mt
+ju/aJklSwYZ5RIlQm2aLhOHjTwxb9vb5T7PtGlDuwd+k2QiWi6oia3+f8lpv+SXbQd0u+YNwO+Y0
++wPwzOgi2JGr0ogXdBApxiF4iAHXGcX2eJ4e4dkkXqQrN7KGFF9i2A04gZzvH/7LAgKF05THvVbg
+DzcS6sqOTyrhROleWzge+tNaKoghIn9uQFR0FKOjV7qJoNw6I9t4N2P3vx/vFuxxB+jNWBfQdqe7
+umI7sQfm8Gov6g5YZ6FiwjIxRBtJwrPB6AltAHn0xr9jPB4jN4zPejPOlHZMKu8tlMPXUUgL7O6w
+htZJrdL+gh4+fyf0x5y9YAxkT/xD3UKMvxgcWlg7qC54jgE1wqVktqSfrCfMpkUvbVtLF4uU+4+U
+M36KArsWLdZgeWpZXN2uztp4ZpdXsNYVpLxTkl6uwnl0Q/NQ8KFEq88oQr+p0H3PqYp6OxTxq3b3
+gBnze+HLR05ppph40p2bdCx2jXiKGwxmiQ3ki0lLPqvaX8dHvoI/A42OkzSfzVlrYCMPEwzFUT7D
+a5ziUNSb1acYvB/Di9vFKjkDFkfIqqcj3Bi21spJ1UEyTpfmKqzdNNV+FYk33wJmGo5QPopVdkrR
+7+mUZby+A1GLwhNoKOXkm+r28zA49N1DGTmg7YIdituVH48DzcUbNj5EeRnYso+JXcHfUOt8QH7c
++vCGIFojUSdJifOqa1qbEiYby17UuUZI5cUvyhspHiUWdNmGTAdVjXXSNidQLu1RHb1R9rUmoAwQ
+AmWg0hB0AA7SumHd6XrZM8VhfJEYim5B9T4uGTdPPCNBm+zPuWAT2UnGGH5ZKtFAWfrNKEvKvyzj
+glDGx/+L8R9FX6Slr1TyH0d4njISBwAA
+EOF
+----
++
+. Start pivoting with Zeek conn events
++
+[source, bash, options="nowrap"]
+----
+# Create `zeek.jsonl`
+[/tmp/ctf-05.bl9]$ find ./elfu-zeeklogs/ \
+                          -iname 'conn*.log' \
+                          -type f \
+                          -exec python ./convert-log.py {} ';' > zeek-conn.jsonl
+
+# Check sizes
+[/tmp/ctf-05.bl9]$ ls -lh zeek-conn.jsonl
+-rw-r--r-- 1 t4r t4r 770M Dec 28 18:57 zeek-conn.jsonl
+
+# Look for long-lived connections
+[/tmp/ctf-05.bl9]$ cat zeek-conn.jsonl \
+                     | jq -s -c '[.[] | select(.duration!="-")] | . | sort_by(.duration|tonumber) | reverse | .[]' \
+                       | head \
+                         | tee top-conn.txt
+
+# Make it eaiser to read
+[/tmp/ctf-05.bl9]$ cat top-conn.txt \
+                     | jq -c '{"proto", "id.orig_h", "id.resp_h", "id.resp_p", "uid"}'
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"255.255.255.255","id.resp_p":"17500","uid":"CFp61A2tCWNnVBMvZ8"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"10.142.151.255","id.resp_p":"17500","uid":"CPEjh03sHL2fw2KVr9"}
+{"proto":"tcp","id.orig_h":"192.168.134.130","id.resp_h":"148.69.64[.]76","id.resp_p":"443","uid":"C9mIoHHpnSvcvBUme"}
+{"proto":"tcp","id.orig_h":"192.168.134.130","id.resp_h":"148.69.64[.]76","id.resp_p":"443","uid":"Cpsfbu2RiDZx0c8kn7"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"255.255.255.255","id.resp_p":"17500","uid":"CHgaNmEHxh4EU0oQj"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"10.142.151.255","id.resp_p":"17500","uid":"C0SkC82J7wY3N1WG5l"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"255.255.255.255","id.resp_p":"17500","uid":"Cz6Yt11qPAC75MXHt4"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"10.142.151.255","id.resp_p":"17500","uid":"CbtldJSgT161hzY53"}
+{"proto":"tcp","id.orig_h":"192.168.134.130","id.resp_h":"148.69.64[.]76","id.resp_p":"443","uid":"C0ZpeF4800AaS7daZe"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"255.255.255.255","id.resp_p":"17500","uid":"CW9Hxc1ETzjzpoCT8c"}
+----
++
+NOTE: `192.168.134.130` => `148.69.64[.]76:443/tcp` seems pretty *sketch*.
+
+NOTE: Answer: `192.168.134.130`
+
 == Side challenges
 
 === Escaping ED
