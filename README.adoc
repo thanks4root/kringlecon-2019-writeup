@@ -874,3 +874,66 @@ NOTE: *Answer*: `7331`
 - Hey, if you think you can help with another problem, Prof. Banas could use a hand too.
 - Head west to the other side of the quad into Hermey Hall and find him in the Laboratory.
 ----
+
+=== Holiday Hack Trail
+
+Location: `Dorm`
+
+image::side/02-holiday-hack-trail/00-location.png[Picture of challenge location]
+
+The goal of this challenge is to cheat at a game that has very basic anti-cheat built in.
+
+image::side/02-holiday-hack-trail/01-screen.png[Image of the keypad]
+
+==== Solution
+
+===== Easy
+
+. Start a game
+. Played with the url
++
+----
+hhc://trail.hhc/store/?difficulty=0&distance=0&money=5000&pace=0&curmonth=7&curday=1&reindeer=2&runners=2&ammo=100&meds=20&food=400&name0=Ryan&health0=100&cond0=0&causeofdeath0=&deathday0=0&deathmonth0=0&name1=Anna&health1=100&cond1=0&causeofdeath1=&deathday1=0&deathmonth1=0&name2=Chris&health2=100&cond2=0&causeofdeath2=&deathday2=0&deathmonth2=0&name3=Mathias&health3=100&cond3=0&causeofdeath3=&deathday3=0&deathmonth3=0
+----
++
+. Noticed that `distance` could be changed
+. Set `distance` => `7990`
++
+----
+hhc://trail.hhc/store/?difficulty=0&distance=7990&money=5000&pace=0&curmonth=7&curday=1&reindeer=2&runners=2&ammo=100&meds=20&food=400&name0=Ryan&health0=100&cond0=0&causeofdeath0=&deathday0=0&deathmonth0=0&name1=Anna&health1=100&cond1=0&causeofdeath1=&deathday1=0&deathmont
+----
++
+image::side/02-holiday-hack-trail/02-edited.png[Edited url]
++
+. Click *Buy* button in store
++
+image::side/02-holiday-hack-trail/03-close.png[Close to the end]
++
+. Press *Go*
+
+image::side/02-holiday-hack-trail/04-win.png[Win message]
+
+==== Chat
+
+.Chat log
+----
+(Minty Candycane - PRE)
+- Hi! I'm Minty Candycane!
+- I just LOVE this old game!
+- I found it on a 5 1/4" floppy in the attic.
+- You should give it a go!
+- If you get stuck at all, check out this year's talks.
+- If you get stuck at all, check out this year's talks.
+- One is about web application penetration testing.
+- Good luck, and don't get dysentery!
+
+
+(Minty Candycane - POST)
+- You made it - congrats!
+- Have you played with the key grinder in my room? Check it out!
+- It turns out: if you have a good image of a key, you can physically copy it.
+- Maybe you'll see someone hopping around with a key here on campus.
+- Sometimes you can find it in the Network tab of the browser console.
+- Deviant has a great talk on it at this year's Con.
+- He even has a collection of key bitting templates for common vendors like Kwikset, Schlage, and Yale.
+----
