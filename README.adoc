@@ -1445,6 +1445,180 @@ image::main/10/00-decrypted.png[First page of decrypted document]
 
 *Answer:* `Machine Learning Sleigh Route Finder`
 
+=== 11 - Open the Sleigh Shop Door
+
+Location: `https://crate.elfu.org/`
+
+Difficulty: `5/5`
+
+image::main/11/00-location.png[]
+
+.Objective
+----
+Visit Shinny Upatree in the Student Union and help solve their problem. What is written on the paper you retrieve for Shinny?
+
+For hints on achieving this objective, please visit the Student Union and talk with Kent Tinseltooth.
+----
+
+==== Solution
+
+WARNING: Start with lock 04! Sometimes the key for this challenge does not work :(.
+
+. Lock 01
++
+----
+- I locked the crate with the villain's name inside. Can you get it out?
+- You don't need a clever riddle to open the console and scroll a little.
+----
++
+** This one is in the console
++
+image::main/11/02-console.png[]
++
+. Lock 02
++
+----
+- Some codes are hard to spy, perhaps they'll show up on pulp with dye?
+----
++
+** I selected an element near this in the DOM
++
+image::main/11/03-dom.png[]
++
+. Lock 03
++
+----
+- This code is still unknown; it was fetched but never shown.
+----
++
+** This one can be found in the network tools tab
++
+image::main/11/04-net.png[]
++
+. Lock 04
++
+----
+- Where might we keep the things we forage? Yes, of course: Local barrels!
+----
++
+** This key is in the sites local storage
++
+image::main/11/01-storage.png[]
++
+. Lock 05
++
+----
+- Did you notice the code in the title? It may very well prove vital.
+----
++
+** This one was in the title
++
+image::main/11/05-title.png[]
++
+. Lock 06
++
+----
+- In order for this hologram to be effective, it may be necessary to increase your perspective.
+----
++
+** This one requires you to change the `perspective` value for the hologram
++
+.Pre change
+image::main/11/06-pre.png[]
++
+.Adding style
+image::main/11/07-style.png[]
++
+.Post change
+image::main/11/08-post.png[]
++
+. Lock 07
++
+----
+- The font you're seeing is pretty slick, but this lock's code was my first pick.
+----
++
+** This one is found in the font name for the challenge text
++
+image::main/11/09-font.png[]
++
+. Lock 08
++
+----
+- In the event that the .eggs go bad, you must figure out who will be sad.
+----
++
+** This one can be found in the `Event Listeners` for `.eggs`
++
+image::main/11/10-event.png[]
++
+. Lock 09
++
+----
+- This next code will be unredacted, but only when all the chakras are :active.
+----
++
+** This one requires you to set all of the spans with class `chakra` to `:active`
++
+.Force the state
+image::main/11/11-active.png[]
++
+.Revealed
+image::main/11/12-done.png[]
+. Lock 10
++
+----
+- Oh, no! This lock's out of commission! Pop off the cover and locate what's missing.
+----
++
+** This one requires you to find the missing parts for the lock
+** Remove the lid of the lock
++
+.Hide the lid element
+image::main/11/13-hide.png[]
++
+.Inners of the lock
+image::main/11/14-uncovered.png[]
++
+NOTE: You can see that there are three elements missing from the lock, a cotton swab, gnome, and macaroni; also note the code is at the bottom right of the board.
++
+** Copy + paste the missing elements into the lock container
++
+.Copy the components
+image::main/11/15-find.png[]
++
+.Ctrl + v it into the lock container
+image::main/11/16-fixed.png[]
+
+image::main/11/17-end.png[]
+
+*Answer:* `The Tooth Fairy`
+
+==== Chat
+
+.Chat log
+----
+(Shinny Upatree - PRE)
+- Hey there.
+- Psst - hey!
+- I'm Shinny Upatree, and I know what's going on!
+- Yeah, that's right - guarding the sleigh shop has made me privvy to some serious, high-level intel.
+- In fact, I know WHO is causing all the trouble.
+- Cindy? Oh no no, not that who. And stop guessing - you'll never figure it out.
+- The only way you could would be if you could break into my crate, here.
+- You see, I've written the villain's name down on a piece of paper and hidden it away securely!
+
+(Shinny Upatree - POST)
+- Wha - what?? You got into my crate?!
+- Well that's embarrassing...
+- But you know what? Hmm... If you're good enough to crack MY security...
+- Do you think you could bring this all to a grand conclusion?
+- Please go into the sleigh shop and see if you can finish this off!
+- Stop the Tooth Fairy from ruining Santa's sleigh route!
+----
+
+----
+
 == Side challenges
 
 === Escaping ED
