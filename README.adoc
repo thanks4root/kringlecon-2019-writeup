@@ -12,7 +12,7 @@ Location: `Train Station`
 
 Difficulty: `0/5`
 
-image::99/00-Hello.png[My character next to santa]
+image::../99/00-Hello.png[My character next to santa]
 
 * After signing in for the first time you find yourself at the `Train Station`
 * Talk to `Santa`
