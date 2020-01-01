@@ -2,7 +2,7 @@
 Brandon Ingalls <brandon@tr4.dev>
 v0.1.0, 2019-12-28
 :toc:
-:imagesdir: ./images
+:imagesdir: ./images/main
 
 == Challenges
 
@@ -32,7 +32,7 @@ Location: `The Quad`
 
 Difficulty: `0/5`
 
-image::main/00/00-location.png[Me next to Santa]
+image::00/00-location.png[Me next to Santa]
 
 .Objective
 ----
@@ -66,7 +66,7 @@ Location: `Student Union`
 
 Difficulty: `0/5`
 
-image::main/01/00-location.png[Me next to the doves]
+image::01/00-location.png[Me next to the doves]
 
 .Objective
 ----
@@ -91,7 +91,7 @@ Location: `The Quad`
 
 Difficulty: `1/5`
 
-image::main/02/00-location.png[Me next to the redacted document]
+image::02/00-location.png[Me next to the redacted document]
 
 .Objective
 ----
@@ -109,13 +109,13 @@ NOTE: SHA256 `2f7b3ba81f1718d29ee73e82b19eb0f7a85e5b7835aaac0155edd233619b3c5e`
 
 . Open the PDF
 +
-image::main/02/01-document.png[Picture of redacted document]
+image::02/01-document.png[Picture of redacted document]
 +
 . Select all text in the document
 +
 NOTE: Using `[Ctrl]` + `a`
 +
-image::main/02/02-selected.png[Picture of highlighted document]
+image::02/02-selected.png[Picture of highlighted document]
 +
 . Copy the text
 +
@@ -295,7 +295,7 @@ NOTE: Scan happened `2019-11-19 12:21` => `2019-11-19 12:22`
 ----
 +
 .Example 4624 event
-image::main/03/00-4624.png[Example 4624 event]
+image::03/00-4624.png[Example 4624 event]
 +
 .. Parse filtered `4624` events into a more readable format
 +
@@ -553,7 +553,7 @@ Location: `https://splunk.elfu.org/`
 
 Difficulty: `3/5`
 
-image::main/06/00-location.png[Challenge screen]
+image::06/00-location.png[Challenge screen]
 
 .Objective
 ----
@@ -569,14 +569,14 @@ We need to complete the Training questions to get important bits of information 
 . What is the short host name of Professor Banas' computer?
 ** We can find this inside of the `SOC chat`
 +
-image::main/06/01-hostname.png[Picture showing hostname of sweetums]
+image::06/01-hostname.png[Picture showing hostname of sweetums]
 +
 NOTE: *Answer:* `sweetums`
 +
 . What is the name of the sensitive file that was likely accessed and copied by the attacker? Please provide the fully qualified location of the file. (Example: C:\temp\report.pdf)
 ** After solving question one, the chat app updates with more information
 +
-image::main/06/02-hint.png[Hint that gives you a starting search]
+image::06/02-hint.png[Hint that gives you a starting search]
 +
 ** The link takes you to the following Splunk search
 +
@@ -592,7 +592,7 @@ AND cbanas
 AND Users
 ----
 +
-image::main/06/03-answer.png[Answer for q02]
+image::06/03-answer.png[Answer for q02]
 +
 NOTE: *Answer:* `C:\Users\cbanas\Documents\Naughty_and_Nice_2019_draft.txt`
 +
@@ -607,7 +607,7 @@ AND Computer="sweetums*"
 AND process_name="powershell.exe"
 ----
 +
-image::main/06/04-search.png[Search results]
+image::06/04-search.png[Search results]
 +
 NOTE: *Answer:* `144.202.46[.]214.vultr[.]com`
 +
@@ -620,12 +620,12 @@ AND EventID=1
 AND Computer="sweetums*"
 ----
 +
-image::main/06/05-table.png[Search results]
+image::06/05-table.png[Search results]
 +
 ** I see see Powershell running an Empire payload at `05:18 PM`
 ** https://gchq.github.io/CyberChef/#recipe=From_Base64('A-Za-z0-9%2B/%3D',true)Decode_text('UTF-16LE%20(1200)')Generic_Code_Beautify()[CyberChef Recipe]
 +
-image::main/06/06-payload.png[Empire payload decoded]
+image::06/06-payload.png[Empire payload decoded]
 +
 NOTE: The parent process of the malicious `powershell.exe` is `WmiPrvSE.exe`, so it was started via a script, going to guess it was from an office product macro.
 +
@@ -637,11 +637,11 @@ AND EventCode=1
 AND NOT docx
 ----
 +
-image::main/06/07-no-results.png[No bad results]
+image::06/07-no-results.png[No bad results]
 +
 ** Noticed this message in chat
 +
-image::main/06/08-chat.png[Chat message]
+image::06/08-chat.png[Chat message]
 +
 ** Tried new search (Limited to around the time Empire payload was executed)
 +
@@ -653,14 +653,14 @@ AND NOT docx
 | sort _time
 ----
 +
-image::main/06/09-found-bad.png[Table with bad doc]
+image::06/09-found-bad.png[Table with bad doc]
 +
 NOTE: *Answer:* `19th Century Holiday Cheer Assignment.docm`
 +
 . How many unique email addresses were used to send Holiday Cheer essays to Professor Banas? Please provide the numeric value. (Example: 1)
 ** Read the chat
 +
-image::main/06/10-chat.png[Chat message]
+image::06/10-chat.png[Chat message]
 +
 ** Need to look for emails with the subject of *Holiday Cheer Assignment Submission*
 +
@@ -686,7 +686,7 @@ AND results{}.workers.smtp.subject="Holiday Cheer Assignment Submission"
 AND docm
 ----
 +
-image::main/06/11-results.png[Search results]
+image::06/11-results.png[Search results]
 +
 NOTE: *Answer:* `123456789`
 +
@@ -701,7 +701,7 @@ NOTE: This is the official challenge solution, we needed the information from th
 
 . Find artifact meta information
 +
-image::main/06/12-artifacts.png[Email artifacts]
+image::06/12-artifacts.png[Email artifacts]
 +
 . Convert artifact links to download urls
 +
@@ -760,7 +760,7 @@ NOTE: I've only showed the relevant content
 ff1ea6f13be3faabd0da728f514deb7fe3577cc4:...<dc:description>Kent you are so unfair. And we were going to make you the king of the Winter Carnival.</dc:description>...
 ----
 
-image::main/06/13-end.png[Congrats screen]
+image::06/13-end.png[Congrats screen]
 
 *Answer*: `Kent you are so unfair. And we were going to make you the king of the Winter Carnival.`
 
@@ -770,7 +770,7 @@ Location: `Dorm`
 
 Difficulty: `3/5`
 
-image::main/07/00-location.png[Room in the dorm]
+image::07/00-location.png[Room in the dorm]
 
 .Objective
 ----
@@ -790,12 +790,12 @@ NOTE: This character has the key you are looking for on their belt.
 
 . Open the browser's network tools tab
 +
-image::main/07/01-tools.png[Network tool]
+image::07/01-tools.png[Network tool]
 +
 . Enter the room
 . Locate the NPC's asset load network event
 +
-image::main/07/02-get.png[Krampus asset network event]
+image::07/02-get.png[Krampus asset network event]
 +
 . Save the asset
 +
@@ -803,21 +803,21 @@ image::main/07/02-get.png[Krampus asset network event]
 https://2019.kringlecon.com/images/avatars/elves/krampus.png
 ----
 +
-image::main/07/03-krampus.png[Krampus asset, height=100, width=100]
+image::07/03-krampus.png[Krampus asset, height=100, width=100]
 +
 . Cleaned the picture up with GIMP
 +
-image::main/07/04-key.png[Plain key]
+image::07/04-key.png[Plain key]
 +
 . Decoded the key by looking at the heights relative to each other
 +
 NOTE: *Key Bitting*: `122520`
 +
-image::main/07/07-make-key.png[Crerating a key]
+image::07/07-make-key.png[Crerating a key]
 +
-image::main/07/05-122520.png[My key]
+image::07/05-122520.png[My key]
 
-image::main/07/06-win.png[Win screen]
+image::07/06-win.png[Win screen]
 
 *Answer:* `Krampus Hollyfeld`
 
@@ -841,7 +841,7 @@ Location: `TBD`
 
 Difficulty: `4/5`
 
-image::main/08/00-location.png[Me next to Krampus]
+image::08/00-location.png[Me next to Krampus]
 
 .Objective
 ----
@@ -854,7 +854,7 @@ WARNING: On my initial run through of the CTF I completed this challenge before 
 
 * https://fridosleigh.com/[Frido Sleigh]
 +
-image::main/08/01-site.png[Screenshot of the website]
+image::08/01-site.png[Screenshot of the website]
 +
 * https://mega.nz/#!Q0pnAYaB!ht9-69waSJUjorEiMybCebgCmajMsknA4NmHdx3wH20[capteha_api.py]
 ** Skeleton solution script that I missed :)
@@ -948,37 +948,37 @@ EOF
 1000
 ----
 +
-image::main/08/02-have-pics.png[Showing I have images downloaded]
+image::08/02-have-pics.png[Showing I have images downloaded]
 +
 ** Manually categorize all of these images :(
 +
 .Folders for each type
-image::main/08/03-folders.png[Folders of picture types]
+image::08/03-folders.png[Folders of picture types]
 +
 .All clean and uniform
-image::main/08/04-neat.png[Showing each folder only has images of that type]
+image::08/04-neat.png[Showing each folder only has images of that type]
 . Build a model
 ** I wanted to try Google's https://teachablemachine.withgoogle.com/[Teachable Machine] for this
 +
-image::main/08/05-tm.png[New project screen]
+image::08/05-tm.png[New project screen]
 +
 ** I went with the `Image Project`
 ** I created a class for each of the image types
 +
-image::main/08/06-classes.png[Picture of all classes]
+image::08/06-classes.png[Picture of all classes]
 +
 ** Named all 6 classes `candy_canes, christmas_trees, ornaments, presents, santa_hats, and stockings`
 ** Uploaded photos into their classes
 +
-image::main/08/07-full.png[]
+image::08/07-full.png[]
 +
 ** Clicked `Train Model` button
 +
-image::main/08/08-training.png[]
+image::08/08-training.png[]
 +
 ** Exported my model
 +
-image::main/08/09-export.png[]
+image::08/09-export.png[]
 +
 . Solve the CAPTEHA
 ** Run my custom script
@@ -1053,7 +1053,7 @@ EOF
 Entries for email address REDACTED no longer accepted as our systems show your email was already randomly selected as a winner! Go check your email to get your winning code. Please allow up to 3-5 minutes for the email to arrive in your inbox or check your spam filter settings.
 ----
 
-image::main/08/10-email.png[Winner email]
+image::08/10-email.png[Winner email]
 
 *Answer:* `8Ia8LiZEwvyZr2WO`
 
@@ -1107,7 +1107,7 @@ Gain access to the data on the Student Portal server and retrieve the paper scra
 
 * https://studentportal.elfu.org/[Elf University]
 +
-image::main/09/00-website.png[]
+image::09/00-website.png[]
 * https://mega.nz/#!wsx20ChA!_dLMsePbp28JTRAeqWrUq7dD9YrKRev8L-VwyMpOK_c[krampus-images.zip]
 ** Copy of raw files required scraped from the database
 +
@@ -1169,7 +1169,7 @@ Database: elfu
 +
 . Piece images together
 +
-image::main/09/01-finished.png[]
+image::09/01-finished.png[]
 
 *Answer:* `Super Sled-o-matic`
 
@@ -1192,7 +1192,7 @@ Location: `Offline`
 
 Difficulty: `5/5`
 
-image::main/10/00-location.png[]
+image::10/00-location.png[]
 
 .Objective
 ----
@@ -1441,7 +1441,7 @@ EOF
 [I] Outputted decrypted file
 ----
 
-image::main/10/00-decrypted.png[First page of decrypted document]
+image::10/00-decrypted.png[First page of decrypted document]
 
 *Answer:* `Machine Learning Sleigh Route Finder`
 
@@ -1451,7 +1451,7 @@ Location: `https://crate.elfu.org/`
 
 Difficulty: `5/5`
 
-image::main/11/00-location.png[]
+image::11/00-location.png[]
 
 .Objective
 ----
@@ -1473,7 +1473,7 @@ WARNING: Start with lock 04! Sometimes the key for this challenge does not work 
 +
 ** This one is in the console
 +
-image::main/11/02-console.png[]
+image::11/02-console.png[]
 +
 . Lock 02
 +
@@ -1483,7 +1483,7 @@ image::main/11/02-console.png[]
 +
 ** I selected an element near this in the DOM
 +
-image::main/11/03-dom.png[]
+image::11/03-dom.png[]
 +
 . Lock 03
 +
@@ -1493,7 +1493,7 @@ image::main/11/03-dom.png[]
 +
 ** This one can be found in the network tools tab
 +
-image::main/11/04-net.png[]
+image::11/04-net.png[]
 +
 . Lock 04
 +
@@ -1503,7 +1503,7 @@ image::main/11/04-net.png[]
 +
 ** This key is in the sites local storage
 +
-image::main/11/01-storage.png[]
+image::11/01-storage.png[]
 +
 . Lock 05
 +
@@ -1513,7 +1513,7 @@ image::main/11/01-storage.png[]
 +
 ** This one was in the title
 +
-image::main/11/05-title.png[]
+image::11/05-title.png[]
 +
 . Lock 06
 +
@@ -1524,13 +1524,13 @@ image::main/11/05-title.png[]
 ** This one requires you to change the `perspective` value for the hologram
 +
 .Pre change
-image::main/11/06-pre.png[]
+image::11/06-pre.png[]
 +
 .Adding style
-image::main/11/07-style.png[]
+image::11/07-style.png[]
 +
 .Post change
-image::main/11/08-post.png[]
+image::11/08-post.png[]
 +
 . Lock 07
 +
@@ -1540,7 +1540,7 @@ image::main/11/08-post.png[]
 +
 ** This one is found in the font name for the challenge text
 +
-image::main/11/09-font.png[]
+image::11/09-font.png[]
 +
 . Lock 08
 +
@@ -1550,7 +1550,7 @@ image::main/11/09-font.png[]
 +
 ** This one can be found in the `Event Listeners` for `.eggs`
 +
-image::main/11/10-event.png[]
+image::11/10-event.png[]
 +
 . Lock 09
 +
@@ -1561,10 +1561,10 @@ image::main/11/10-event.png[]
 ** This one requires you to set all of the spans with class `chakra` to `:active`
 +
 .Force the state
-image::main/11/11-active.png[]
+image::11/11-active.png[]
 +
 .Revealed
-image::main/11/12-done.png[]
+image::11/12-done.png[]
 . Lock 10
 +
 ----
@@ -1575,22 +1575,22 @@ image::main/11/12-done.png[]
 ** Remove the lid of the lock
 +
 .Hide the lid element
-image::main/11/13-hide.png[]
+image::11/13-hide.png[]
 +
 .Inners of the lock
-image::main/11/14-uncovered.png[]
+image::11/14-uncovered.png[]
 +
 NOTE: You can see that there are three elements missing from the lock, a cotton swab, gnome, and macaroni; also note the code is at the bottom right of the board.
 +
 ** Copy + paste the missing elements into the lock container
 +
 .Copy the components
-image::main/11/15-find.png[]
+image::11/15-find.png[]
 +
 .Ctrl + v it into the lock container
-image::main/11/16-fixed.png[]
+image::11/16-fixed.png[]
 
-image::main/11/17-end.png[]
+image::11/17-end.png[]
 
 *Answer:* `The Tooth Fairy`
 
@@ -1623,7 +1623,7 @@ Location: `https://srf.elfu.org/`
 
 Difficulty: `4/5`
 
-image::main/12/00-location.png[]
+image::12/00-location.png[]
 
 .Objective
 ----
@@ -1755,47 +1755,47 @@ output {
 . Add index pattern to Kibana
 ** Select *Explore on my own*
 +
-image::main/12/01-start.png[]
+image::12/01-start.png[]
 +
 ** Open *Management* tab
 +
-image::main/12/02-settings.png[]
+image::12/02-settings.png[]
 +
 ** Select *Index Patterns*
 +
-image::main/12/03-index-patterns.png[]
+image::12/03-index-patterns.png[]
 +
 ** Select *Create index pattern*
 +
-image::main/12/04-create-pattern.png[]
+image::12/04-create-pattern.png[]
 +
 ** Add pattern for `zeek-http*`
 +
-image::main/12/05-zeek.png[]
+image::12/05-zeek.png[]
 +
 *** *Time Filter field name* to `@timestamp`
 . Look at the data
 +
-image::main/12/06-discover.png[]
+image::12/06-discover.png[]
 +
 ** Where is my data?
 +
-image::main/12/07-no-results.png[]
+image::12/07-no-results.png[]
 +
 ** Set the time window for Kibana to look at
 +
-image::main/12/08-better.png[]
+image::12/08-better.png[]
 +
 . We need to find the credentials
 ** I spent a little looking through the data for keywords like `user` / `pass` / `admin` / `santa` but did not find anything.
 ** I went back through the decrypted pdf from *challenge 10* and noticed this
 +
-image::main/12/09-hint.png[]
+image::12/09-hint.png[]
 +
 ** So I checked if `/.git` was accessible (It was not)
 ** Then I queried the dataset for `readme`
 +
-image::main/12/10-search.png[]
+image::12/10-search.png[]
 +
 .Found https://srf.elfu.org/README.md
 [source, bash, options="nowrap"]
@@ -1823,7 +1823,7 @@ However, it's recommended to change this in the sqlite db to something custom.
 ----
 +
 .Logged in with the creds
-image::main/12/11-login.png[]
+image::12/11-login.png[]
 +
 . Start pivoting on the data
 ** Looking for sketchy stuff in URIs
@@ -1833,13 +1833,13 @@ image::main/12/11-login.png[]
 uri.keyword:/.*(UNION|\.\.|etc\/|'|\<|\>|passw).*/
 ----
 +
-image::main/12/12-uri.png[]
+image::12/12-uri.png[]
 +
 ** Save JSON data to disk
 +
-image::main/12/13-inspect.png[]
+image::12/13-inspect.png[]
 +
-image::main/12/14-data.png[]
+image::12/14-data.png[]
 +
 ** Extract IPs from json blob
 +
@@ -1859,7 +1859,7 @@ AND NOT username:"(empty)"
 +
 *** The API doesn't support basic auth according to the API
 +
-image::main/12/15-user.png[]
+image::12/15-user.png[]
 +
 *** Save the response to disk
 *** Extract the ips
@@ -1878,7 +1878,7 @@ image::main/12/15-user.png[]
 user_agent.keyword:/.*(\<|&|\$|'|UNION).*/
 ----
 +
-image::main/12/16-uas.png[]
+image::12/16-uas.png[]
 +
 *** Save the json response to disk
 *** Extract the bad ips
@@ -1900,7 +1900,7 @@ image::main/12/16-uas.png[]
 AND NOT host:("ssrf.elfu.org" OR "srf.elfu.org" OR "10.20.3.80")
 ----
 +
-image::main/12/21-search.png[]
+image::12/21-search.png[]
 +
 *** Save json response to disk
 *** Extract ips
@@ -1917,7 +1917,7 @@ image::main/12/21-search.png[]
 *** Create new index for use in an ElasticSearch https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html#query-dsl-terms-lookup-example[terms lookup] query
 **** Go to Dev tools
 +
-image::main/12/17-dev-tools.png[]
+image::12/17-dev-tools.png[]
 +
 **** Build json list of ips
 +
@@ -1929,7 +1929,7 @@ image::main/12/17-dev-tools.png[]
 +
 **** Create new index
 +
-image::main/12/18-new-index.png[]
+image::12/18-new-index.png[]
 +
 NOTE: Press the *Play* button.
 +
@@ -1937,12 +1937,12 @@ NOTE: Press the *Play* button.
 +
 NOTE: Excluding the ips from user agents since we don't need them.
 +
-image::main/12/19-make-doc.png[]
+image::12/19-make-doc.png[]
 +
 *** Build list of bad user agents
 **** Add filter to discovery entry
 +
-image::main/12/20-filter.png[]
+image::12/20-filter.png[]
 +
 .Terms lookup filter
 ----
@@ -2031,7 +2031,7 @@ user_agent.keyword:("Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPow
 +
 **** Create table showing number of times a UA shows up in the dataset
 +
-image::main/12/22-ua-table.png[]
+image::12/22-ua-table.png[]
 +
 **** Remove the normal looking ones form your search terms; we want the unique looking ones
 ***** Export to csv
@@ -2111,9 +2111,9 @@ user_agent.keyword("Mozilla/5.0 (Macintosh; U; PPC Mac OS X; fr) AppleWebKit/412
 +
 . Create the DENY rules
 +
-image::main/12/23-ban.png[]
+image::12/23-ban.png[]
 
-image::main/12/24-win.png[]
+image::12/24-win.png[]
 
 ==== Chat
 
