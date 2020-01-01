@@ -1192,8 +1192,6 @@ Location: `Offline`
 
 Difficulty: `5/5`
 
-image::10/00-location.png[]
-
 .Objective
 ----
 The Elfscrow Crypto tool is a vital asset used at Elf University for encrypting SUPER SECRET documents. We can't send you the source, but we do have debug symbols that you can use.
